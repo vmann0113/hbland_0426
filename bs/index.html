@@ -143,7 +143,7 @@
     <div class="modal-content" onclick="event.stopPropagation()">
         <h4 id="modalTitle">문의하실 지점을 선택해주세요</h4>
         <div class="modal-btns">
-            <a href="" id="btnBS" class="modal-btn" style="background: var(--hb-navy);">부산점(본점)</a>
+            <a href="" id="btnBS" class="modal-btn" style="background: var(--hb-navy);">부산점</a>
             <a href="" id="btnCT" class="modal-btn" style="background: var(--hb-line-blue);">센텀점</a>
         </div>
         <div class="modal-close" onclick="closeModal()">닫기</div>
@@ -167,7 +167,7 @@
 
     const LINKS = {
         call: { bs: "tel:0516342325", ct: "tel:01030522325", title: "전화상담 지점 선택", colorBS: "#0A1D37", colorCT: "#1b4b9b" },
-        kakao: { bs: "https://open.kakao.com/o/soq7Ns4d", ct: "https://open.kakao.com/o/sIrXajUf", title: "카톡문의 지점 선택", colorBS: "#FEE500", colorCT: "#FEE500", text: "#3C1E1E" },
+        kakao: { bs: "https://open.kakao.com/o/soq7Ns4d", ct: "https://open.kakao.com/o/sz1xltbi", title: "카톡문의 지점 선택", colorBS: "#FEE500", colorCT: "#FEE500", text: "#3C1E1E" },
         reserve: { bs: "https://m.booking.naver.com/booking/6/bizes/661812", ct: "https://booking.naver.com/booking/6/bizes/1577219", title: "네이버예약 지점 선택", colorBS: "#03C75A", colorCT: "#03C75A" }
     };
 
@@ -190,7 +190,7 @@
         const btnCT = document.getElementById('btnCT');
         document.getElementById('modalTitle').innerText = data.title;
         btnBS.href = data.bs; btnBS.style.background = data.colorBS; btnBS.style.color = data.text || "#fff";
-        btnBS.innerText = "부산점(본점) " + (type === 'call' ? "전화하기" : type === 'kakao' ? "카톡하기" : "예약하기");
+        btnBS.innerText = "부산점 " + (type === 'call' ? "전화하기" : type === 'kakao' ? "카톡하기" : "예약하기");
         btnCT.href = data.ct; btnCT.style.background = data.colorCT; btnCT.style.color = data.text || "#fff";
         btnCT.innerText = "센텀점 " + (type === 'call' ? "전화하기" : type === 'kakao' ? "카톡하기" : "예약하기");
         document.getElementById('selectModal').style.display = 'flex';
