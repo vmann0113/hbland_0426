@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="ko"> 
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+    <title>한빔한복 부산/센텀 통합 예약센터</title>
+    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=90rd8k25s2"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+    <style>
+        :root { 
+            --hb-navy: #0A1D37; --hb-gold: #B8977E; --hb-bg-gray: #eeeef1; 
+            --hb-line-blue: #1b4b9b; --pc-max-width: 1300px; --naver-green: #03C75A;
+            --kakao-yellow: #FEE500;
+        }
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        body { margin: 0; font-family: 'Pretendard', sans-serif; background-color: var(--hb-bg-gray); display: flex; flex-direction: column; align-items: center; }
+
+        .main-wrapper { width: 100%; max-width: var(--pc-max-width); background-color: transparent; }
+
+        /* 1. 이미지 섹션 */
+        .hero-feed img { width: 100%; height: auto; display: block; }
+
+        /* 2. 주소 및 지도 (PC 2배 확대) */
+        .info-sec { padding: 80px 20px; text-align: center; }
+        .info-sec h2 { font-size: 3.5rem; color: var(--hb-navy); margin-bottom: 50px; font-weight: 800; letter-spacing: -2px; }
+        .dual-map-container { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; width: 100%; max-width: 1200px; margin: 0 auto; }
+        .map-card { background: #fff; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .map-card h3 { font-size: 2.2rem; margin-bottom: 20px; color: var(--hb-navy); }
+        .naver-map { width: 100%; height: 400px; border-radius: 12px; }
+        .addr-text { font-size: 1.4rem; color: #555; margin-top: 20px; font-weight: 600; line-height: 1.4; min-height: 3em; }
+
+        /* 3. 타이틀 바 (PC에서는 크게, 모바일은 화면에 맞춰 자동 축소) */
+        .reservation-title-bar { 
+            width: 100%; background-color: var(--hb-line-blue); 
+            padding: 40px 20px; display: flex; align-items: center; justify-content: center; 
+            margin-top: 60px; overflow: hidden;
+        }
+        .title-text { 
+            color: #ffffff; font-size: 3.2rem; font-weight: 800; 
+            display: flex; align-items: center; justify-content: center; 
+            gap: 20px; white-space: nowrap; letter-spacing: -1.5px;
+        }
+        .naver-logo-img { height: 52px; width: auto; display: block; }
+
+        /* 4. 지점 버튼 (PC 2배 확대) */
+        .branch-grid-sec { padding: 80px 20px 150px; text-align: center; }
+        .branch-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; width: 100%; max-width: 1150px; margin: 0 auto; }
+        .branch-link {
+            display: flex; align-items: center; justify-content: center; background: #fff; border: 3px solid var(--hb-line-blue); 
+            color: var(--hb-line-blue); text-decoration: none; height: 120px; border-radius: 15px; font-size: 2.6rem; font-weight: 900;
+        }
+
+        /* 5. 푸터 */
+        footer { padding: 120px 20px 220px; background: #222; color: #bbb; text-align: center; width: 100%; line-height: 2; }
+        .hb-footerLogo { height: 150px; width: auto; margin-bottom: 40px; filter: brightness(0) invert(1); }
+        .biz-item { border-bottom: 1px solid #444; padding-bottom: 20px; margin-bottom: 20px; }
+        .ft-strong { font-size: 1.4rem; font-weight: 700; color: #fff; display: block; margin-bottom: 5px; }
+
+        /* 6. 고정 CTA */
+        .fixed-cta { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: var(--pc-max-width); background: #fff; display: flex; padding: 15px; gap: 12px; box-shadow: 0 -5px 25px rgba(0,0,0,0.15); z-index: 1000; }
+        .cta-btn { flex: 1; height: 90px; display: flex; align-items: center; justify-content: center; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 1.8rem; border: none; cursor: pointer; }
+        .btn-call { background: var(--hb-navy); color: #fff; }
+        .btn-kakao { background: var(--kakao-yellow); color: #3C1E1E; }
+        .btn-reserve { background: var(--naver-green); color: #fff; }
+        .btn-home { background: var(--hb-gold); color: #fff; }
+
+        /* 팝업 모달 */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
+        .modal-content { background: #fff; width: 100%; max-width: 600px; border-radius: 20px; padding: 40px; text-align: center; }
+        .modal-content h4 { font-size: 2.2rem; margin-bottom: 30px; color: var(--hb-navy); letter-spacing: -1px; }
+        .modal-btns { display: flex; flex-direction: column; gap: 15px; }
+        .modal-btn { height: 90px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 2rem; font-weight: 800; text-decoration: none; color: #fff; }
+
+        /* 모바일 최적화 (여기가 핵심) */
+        @media (max-width: 768px) {
+            .info-sec { padding: 30px 15px; }
+            .info-sec h2 { font-size: 1.8rem; margin-bottom: 30px; }
+            .dual-map-container { grid-template-columns: 1fr; gap: 20px; }
+            .map-card h3 { font-size: 1.5rem; } .naver-map { height: 280px; }
+            .addr-text { font-size: 1rem; min-height: auto; }
+
+            /* 🔥 타이틀 바 모바일 대응: 텍스트가 화면을 넘지 않도록 크기 강제 조정 */
+            .reservation-title-bar { padding: 20px 10px; margin-top: 30px; }
+            .title-text { 
+                font-size: 4.8vw; /* 화면 너비에 비례해 글자 크기 축소 */
+                gap: 2vw; 
+            }
+            .naver-logo-img { height: 5vw; } /* 로고도 화면비례 축소 */
+
+            .branch-grid-sec { padding: 30px 15px 80px; }
+            .branch-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .branch-link { height: 75px; font-size: 1.3rem; border-width: 2px; }
+            .cta-btn { height: 60px; font-size: 0.9rem; }
+            .modal-content { padding: 30px 20px; }
+            .modal-content h4 { font-size: 1.5rem; }
+            .modal-btn { height: 60px; font-size: 1.3rem; }
+            footer { padding: 60px 20px 140px; }
+            .hb-footerLogo { height: 80px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <section class="hero-feed">
+        <img src="/assets/01.webp"><img src="/assets/02.webp"><img src="/assets/03.webp">
+        <img src="/assets/04.webp"><img src="/assets/05.webp"><img src="/assets/06.webp">
+    </section>
+
+    <section class="info-sec">
+        <h2>한빔한복 부산/센텀점 위치안내</h2>
+        <div class="dual-map-container">
+            <div class="map-card">
+                <h3>부산점(본점)</h3>
+                <div id="map_busan" class="naver-map"></div>
+                <p class="addr-text">부산광역시 부산진구 자유평화로 17, 3층 (범천동)</p>
+            </div>
+            <div class="map-card">
+                <h3>센텀점</h3>
+                <div id="map_centum" class="naver-map"></div>
+                <p class="addr-text">부산광역시 해운대구 센텀서로 30</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="reservation-title-bar">
+        <div class="title-text">
+            전국 지점별 <img src="/assets/naver_logo.png" class="naver-logo-img"> 예약링크
+        </div>
+    </div>
+
+    <section class="branch-grid-sec">
+        <div class="branch-grid" id="branchGrid"></div>
+    </section>
+
+    <footer>
+        <img class="hb-footerLogo" src="/assets/footer_logo.png">
+        <div class="biz-item">
+            <span class="ft-strong">한빔한복 부산점(본점)</span>
+            대표자: 김태현 | 등록번호: 637-48-00829 | TEL.051-634-2325
+        </div>
+        <div class="biz-item">
+            <span class="ft-strong">한빔한복 센텀점</span>
+            대표자: 김태현 | 등록번호: 637-48-00829 | TEL.010-3052-2325
+        </div>
+        <div style="color:#666; margin-top:20px;">ⓒ Hanbim Hanbok</div>
+    </footer>
+</div>
+
+<div class="fixed-cta">
+    <button onclick="openModal('call')" class="cta-btn btn-call">전화상담</button>
+    <button onclick="openModal('kakao')" class="cta-btn btn-kakao">카톡문의</button>
+    <button onclick="openModal('reserve')" class="cta-btn btn-reserve">네이버예약</button>
+    <a href="https://hanbeam.co.kr" class="cta-btn btn-home">홈페이지</a>
+</div>
+
+<div id="selectModal" class="modal-overlay" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <h4 id="modalTitle">문의하실 지점을 선택해주세요</h4>
+        <div class="modal-btns">
+            <a href="" id="btnBS" class="modal-btn" style="background: var(--hb-navy);">부산점(본점)</a>
+            <a href="" id="btnCT" class="modal-btn" style="background: var(--hb-line-blue);">센텀점</a>
+        </div>
+        <div class="modal-close" onclick="closeModal()">닫기</div>
+    </div>
+</div>
+
+<script>
+    const BRANCH_LIST = [
+        { name: "부산점", url: "https://m.booking.naver.com/booking/6/bizes/661812" },
+        { name: "센텀점", url: "https://booking.naver.com/booking/6/bizes/1577219" },
+        { name: "울산점", url: "https://booking.naver.com/booking/6/bizes/1534767" },
+        { name: "김해점", url: "https://booking.naver.com/booking/6/bizes/1402679" },
+        { name: "양산점", url: "https://booking.naver.com/booking/13/bizes/868629" },
+        { name: "창원점", url: "https://booking.naver.com/booking/6/bizes/843111" },
+        { name: "마산점", url: "https://booking.naver.com/booking/6/bizes/1526541" },
+        { name: "진주점", url: "https://m.booking.naver.com/booking/6/bizes/1485854" },
+        { name: "인천점", url: "https://m.booking.naver.com/booking/13/bizes/1039475" },
+        { name: "안산점", url: "https://m.booking.naver.com/booking/6/bizes/1500008" },
+        { name: "대구점", url: "https://m.place.naver.com/place/2043617700/ticket" }
+    ];
+
+    const LINKS = {
+        call: { bs: "tel:0516342325", ct: "tel:01030522325", title: "전화상담 지점 선택", colorBS: "#0A1D37", colorCT: "#1b4b9b" },
+        kakao: { bs: "https://open.kakao.com/o/soq7Ns4d", ct: "https://open.kakao.com/o/sIrXajUf", title: "카톡문의 지점 선택", colorBS: "#FEE500", colorCT: "#FEE500", text: "#3C1E1E" },
+        reserve: { bs: "https://m.booking.naver.com/booking/6/bizes/661812", ct: "https://booking.naver.com/booking/6/bizes/1577219", title: "네이버예약 지점 선택", colorBS: "#03C75A", colorCT: "#03C75A" }
+    };
+
+    function init() {
+        const grid = document.getElementById('branchGrid');
+        BRANCH_LIST.forEach(b => {
+            const a = document.createElement('a'); a.className = 'branch-link'; a.href = b.url; a.target = '_blank'; a.innerText = b.name; grid.appendChild(a);
+        });
+
+        const mapBS = new naver.maps.Map('map_busan', { center: new naver.maps.LatLng(35.1432, 129.0645), zoom: 16 });
+        new naver.maps.Marker({ position: new naver.maps.LatLng(35.1432, 129.0645), map: mapBS });
+
+        const mapCT = new naver.maps.Map('map_centum', { center: new naver.maps.LatLng(35.1748, 129.1271), zoom: 16 });
+        new naver.maps.Marker({ position: new naver.maps.LatLng(35.1748, 129.1271), map: mapCT });
+    }
+
+    function openModal(type) {
+        const data = LINKS[type];
+        const btnBS = document.getElementById('btnBS');
+        const btnCT = document.getElementById('btnCT');
+        document.getElementById('modalTitle').innerText = data.title;
+        btnBS.href = data.bs; btnBS.style.background = data.colorBS; btnBS.style.color = data.text || "#fff";
+        btnBS.innerText = "부산점(본점) " + (type === 'call' ? "전화하기" : type === 'kakao' ? "카톡하기" : "예약하기");
+        btnCT.href = data.ct; btnCT.style.background = data.colorCT; btnCT.style.color = data.text || "#fff";
+        btnCT.innerText = "센텀점 " + (type === 'call' ? "전화하기" : type === 'kakao' ? "카톡하기" : "예약하기");
+        document.getElementById('selectModal').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('selectModal').style.display = 'none'; }
+    window.onload = init;
+</script>
+</body>
+</html>

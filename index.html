@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="ko"> 
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+    <title>한빔한복 공식 예약센터</title>
+    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=90rd8k25s2"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+    <style>
+        :root { 
+            --hb-navy: #0A1D37; --hb-gold: #B8977E; --hb-bg-gray: #eeeef1; 
+            --hb-line-blue: #1b4b9b; --pc-max-width: 1300px; 
+        }
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        body { margin: 0; font-family: 'Pretendard', sans-serif; background-color: var(--hb-bg-gray); display: flex; flex-direction: column; align-items: center; }
+
+        .main-wrapper { width: 100%; max-width: var(--pc-max-width); background-color: transparent; }
+
+        /* 1. 이미지 섹션 */
+        .hero-feed img { width: 100%; height: auto; display: block; }
+
+        /* 2. 주소 및 지도 (PC 2배 확대) */
+        .info-sec { padding: 80px 20px; text-align: center; }
+        .info-sec h2 { font-size: 3.5rem; color: var(--hb-navy); margin-bottom: 35px; font-weight: 800; letter-spacing: -2px; }
+        .map-card { background: #fff; padding: 25px; border-radius: 20px; width: 100%; max-width: 1100px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        #naverMap { width: 100%; height: 550px; border-radius: 12px; }
+        .addr-text { font-size: 1.6rem; color: #555; margin-top: 25px; font-weight: 600; }
+
+        /* 3. 타이틀 바 (PC 2배 확대) */
+        .reservation-title-bar { width: 100%; background-color: var(--hb-line-blue); padding: 40px 10px; display: flex; align-items: center; justify-content: center; margin-top: 60px; }
+        .title-text { color: #ffffff; font-size: 3.2rem; font-weight: 800; display: flex; align-items: center; gap: 20px; white-space: nowrap; }
+        .naver-logo-img { height: 52px; width: auto; }
+
+        /* 4. 지점 버튼 (PC 2배 확대) */
+        .branch-grid-sec { padding: 80px 20px 150px; text-align: center; }
+        .branch-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; width: 100%; max-width: 1150px; margin: 0 auto; }
+        .branch-link {
+            display: flex; align-items: center; justify-content: center; background: #fff; border: 3px solid var(--hb-line-blue); 
+            color: var(--hb-line-blue); text-decoration: none; height: 120px; border-radius: 15px; font-size: 2.6rem; font-weight: 900;
+            transition: all 0.2s ease;
+        }
+        .branch-link:hover { background-color: var(--hb-line-blue); color: #fff; transform: translateY(-5px); }
+
+        /* 5. 푸터 */
+        footer { padding: 120px 20px 220px; background: #222; color: #bbb; text-align: center; width: 100%; line-height: 2; }
+        .hb-footerLogo { height: 150px; width: auto; margin-bottom: 40px; filter: brightness(0) invert(1); }
+        
+        .hb-footerLineStrong { 
+            font-size: 1.6rem; font-weight: 700; color: #fff; margin-bottom: 15px;
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+        }
+        .hb-footerLineStrong .sep { display: none; } 
+
+        .hb-footerLine { font-size: 1.2rem; margin-bottom: 8px; }
+        .hb-footerCopy { font-size: 1.1rem; margin-top: 30px; color: #666; }
+
+        /* 6. CTA (PC 2배 확대) */
+        .fixed-cta { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: var(--pc-max-width); background: #fff; display: flex; padding: 15px; gap: 12px; box-shadow: 0 -5px 25px rgba(0,0,0,0.15); z-index: 1000; }
+        .cta-btn { flex: 1; height: 90px; display: flex; align-items: center; justify-content: center; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 1.8rem; }
+        .btn-call { background: var(--hb-navy); color: #fff; }
+        .btn-kakao { background: #FEE500; color: #3C1E1E; }
+        .btn-reserve { background: #03C75A; color: #fff; }
+        .btn-home { background: var(--hb-gold); color: #fff; }
+
+        /* 반응형 설정 (모바일 간격 대폭 축소) */
+        @media (min-width: 769px) {
+            .hb-footerLineStrong { flex-direction: row; justify-content: center; gap: 15px; }
+            .hb-footerLineStrong .sep { display: inline; color: #555; }
+        }
+
+        @media (max-width: 768px) {
+            /* 섹션 간격 축소 */
+            .info-sec { padding: 30px 15px; } /* 이미지 하단과 지도 사이 간격 축소 */
+            .info-sec h2 { font-size: 1.8rem; margin-bottom: 15px; }
+            #naverMap { height: 320px; }
+            .addr-text { font-size: 1.1rem; margin-top: 15px; }
+
+            .reservation-title-bar { margin-top: 30px; padding: 15px 10px; } /* 지도와 예약바 사이 간격 축소 */
+            .title-text { font-size: 1.2rem; gap: 8px; } 
+            .naver-logo-img { height: 20px; }
+
+            .branch-grid-sec { padding: 30px 15px 80px; } /* 예약바 하단과 버튼 사이 및 하단 간격 축소 */
+            .branch-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .branch-link { height: 75px; font-size: 1.3rem; border-width: 2px; }
+            
+            .cta-btn { height: 60px; font-size: 0.9rem; border-radius: 8px; }
+
+            footer { padding: 60px 20px 120px; } /* 푸터 내부 및 하단 여백 축소 */
+            .hb-footerLogo { height: 80px; margin-bottom: 20px; }
+            .hb-footerLineStrong { font-size: 1rem; } 
+            .hb-footerLine { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <section class="hero-feed">
+        <img src="assets/01.webp"><img src="assets/02.webp"><img src="assets/03.webp">
+        <img src="assets/04.webp"><img src="assets/05.webp"><img src="assets/06.webp">
+    </section>
+
+    <section class="info-sec">
+        <h2 id="branchTitleDisplay">한빔한복 지점안내</h2>
+        <div class="map-card">
+            <div id="naverMap"></div>
+            <p class="addr-text" id="addrText"></p>
+        </div>
+    </section>
+
+    <div class="reservation-title-bar">
+        <div class="title-text">전국 지점별 <img src="assets/naver_logo.png" class="naver-logo-img"> 예약링크</div>
+    </div>
+
+    <section class="branch-grid-sec">
+        <div class="branch-grid" id="branchGrid"></div>
+    </section>
+
+    <footer>
+        <img class="hb-footerLogo" src="/assets/footer_logo.png" alt="한빔한복 로고">
+        <div class="hb-footerText">
+            <div class="hb-footerLineStrong">
+                <span id="ftName"></span>
+                <span class="sep">|</span>
+                <span id="ftCeo"></span>
+                <span class="sep">|</span>
+                <span id="ftBizNum"></span>
+            </div>
+            <div class="hb-footerLine" id="ftAddr"></div>
+            <div class="hb-footerLine" id="ftTel"></div>
+            <div class="hb-footerCopy">ⓒ Hanbim Hanbok</div>
+        </div>
+    </footer>
+</div>
+
+<div class="fixed-cta">
+    <a href="" id="ctaCall" class="cta-btn btn-call">전화상담</a>
+    <a href="" id="ctaKakao" class="cta-btn btn-kakao">카톡문의</a>
+    <a href="" id="ctaReserve" class="cta-btn btn-reserve">네이버예약</a>
+    <a href="https://hanbeam.co.kr" class="cta-btn btn-home">홈페이지</a>
+</div>
+
+<script>
+    const DATA = {
+        busan: { name: "부산점", ceo: "김태현", bizNum: "637-48-00829", addr: "부산광역시 부산진구 자유평화로 17, 3층 (범천동)", tel: "051-634-2325", naver: "https://m.booking.naver.com/booking/6/bizes/661812", kakao: "https://open.kakao.com/o/soq7Ns4d", lat: 35.1432, lng: 129.0645 },
+        centum: { name: "센텀점", ceo: "[성함]", bizNum: "[번호]", addr: "부산광역시 해운대구 센텀서로 30", tel: "010-3052-2325", naver: "https://booking.naver.com/booking/6/bizes/1577219", kakao: "", lat: 35.1748, lng: 129.1271 },
+        ulsan: { name: "울산점", ceo: "[성함]", bizNum: "[번호]", addr: "울산광역시 남구 번영로 246", tel: "010-9807-2325", naver: "https://booking.naver.com/booking/6/bizes/1534767", kakao: "https://open.kakao.com/o/sKjCbA0h", lat: 35.5412, lng: 129.3321 },
+        gimhae: { name: "김해점", ceo: "[성함]", bizNum: "[번호]", addr: "경상남도 김해시 김해대로 2325", tel: "010-8065-2325", naver: "https://booking.naver.com/booking/6/bizes/1402679", kakao: "https://open.kakao.com/o/sHM2wwsh", lat: 35.2285, lng: 128.8894 },
+        yangsan: { name: "양산점", ceo: "[성함]", bizNum: "[번호]", addr: "경상남도 양산시 물금읍 청운로 350", tel: "055-912-0425", naver: "https://booking.naver.com/booking/13/bizes/868629", kakao: "https://open.kakao.com/o/sp44Hxaf", lat: 35.3284, lng: 129.0118 },
+        changwon: { name: "창원점", ceo: "[성함]", bizNum: "[번호]", addr: "경상남도 창원시 성산구 중앙대로 111", tel: "055-263-2325", naver: "https://booking.naver.com/booking/6/bizes/843111", kakao: "https://open.kakao.com/o/sdcvbh5e", lat: 35.2274, lng: 128.6811 },
+        masan: { name: "마산점", ceo: "[성함]", bizNum: "[번호]", addr: "경상남도 창원시 마산회원구 3.15대로 730", tel: "010-8832-2325", naver: "https://booking.naver.com/booking/6/bizes/1526541", kakao: "https://open.kakao.com/o/ssWvuvYh", lat: 35.2201, lng: 128.5744 },
+        jinju: { name: "진주점", ceo: "[성함]", bizNum: "[번호]", addr: "경상남도 진주시 진주대로 910", tel: "010-5654-2407", naver: "https://m.booking.naver.com/booking/6/bizes/1485854", kakao: "https://open.kakao.com/o/sbxBToNh", lat: 35.1802, lng: 128.0848 },
+        incheon: { name: "인천점", ceo: "[성함]", bizNum: "[번호]", addr: "인천광역시 남동구 인하로 507", tel: "032-283-2325", naver: "https://m.booking.naver.com/booking/13/bizes/1039475", lat: 37.4449, lng: 126.7022 },
+        ansan: { name: "안산점", ceo: "[성함]", bizNum: "[번호]", addr: "경기도 안산시 단원구 광덕대로 155", tel: "010-6591-2322", naver: "https://m.booking.naver.com/booking/6/bizes/1500008", lat: 37.3001, lng: 126.8322 },
+        daegu: { name: "대구점", ceo: "[성함]", bizNum: "[번호]", addr: "대구광역시 중구 동덕로 26", tel: "010-8492-2328", naver: "https://m.place.naver.com/place/2043617700/ticket", lat: 35.8601, lng: 128.6041 }
+    };
+
+    let map, marker;
+    function init() {
+        const grid = document.getElementById('branchGrid');
+        Object.keys(DATA).forEach(key => {
+            const a = document.createElement('a'); a.className = 'branch-link'; a.href = DATA[key].naver; a.target = '_blank'; a.innerText = DATA[key].name; grid.appendChild(a);
+        });
+        const params = new URLSearchParams(window.location.search);
+        updateDisplay(params.get('branch') || 'busan');
+    }
+
+    function updateDisplay(key) {
+        const d = DATA[key] || DATA['busan'];
+        document.getElementById('branchTitleDisplay').innerHTML = `한빔한복 <b>${d.name}</b>`;
+        document.getElementById('addrText').innerText = d.addr;
+        
+        document.getElementById('ftName').innerText = `한빔한복 ${d.name}`;
+        document.getElementById('ftCeo').innerText = `대표자: ${d.ceo}`;
+        document.getElementById('ftBizNum').innerText = `등록번호: ${d.bizNum}`;
+        document.getElementById('ftAddr').innerText = d.addr;
+        document.getElementById('ftTel').innerText = `TEL.${d.tel}`;
+
+        const pos = new naver.maps.LatLng(d.lat, d.lng);
+        if(!map) { map = new naver.maps.Map('naverMap', { center: pos, zoom: 16 }); marker = new naver.maps.Marker({ position: pos, map: map }); } 
+        else { map.setCenter(pos); marker.setPosition(pos); }
+        document.getElementById('ctaCall').href = "tel:" + d.tel.replace(/-/g, "");
+        document.getElementById('ctaKakao').href = d.kakao || "#";
+        document.getElementById('ctaReserve').href = d.naver;
+    }
+    window.onload = init;
+</script>
+</body>
+</html>
