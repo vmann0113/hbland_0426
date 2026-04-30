@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko"> 
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+    <title>한빔한복 통합 예약센터</title>
+    <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=p92c8gq59k"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+    <link rel="stylesheet" href="roulette.css?v=6.0">
+</head>
+<body>
+
+<div class="master-wrapper">
+    <!-- 섹션 1: 룰렛 메인 -->
+    <section id="roulette-section">
+        <div class="roulette-content">
+            <div class="wheel-box">
+                <img src="../assets/roulette_pointer.png" class="pointer">
+                <img src="../assets/roulette_disk.png" id="roulette-disk" onclick="spinEngine()">
+            </div>
+        </div>
+    </section>
+
+    <!-- 섹션 2: 당첨 후 결과 컨텐츠 (폭 1300px 고정 영역) -->
+    <div id="result-content" style="display:none;">
+        <div class="content-container">
+            <section class="landing-feed">
+                <img src="../assets/01.webp"><img src="../assets/02.webp">
+                <img src="../assets/03.webp"><img src="../assets/04.webp">
+                <img src="../assets/05.webp"><img src="../assets/06.webp">
+            </section>
+
+            <section class="form-area" id="form-section">
+                <div class="form-card">
+                    <h2 id="won-prize-display"></h2>
+                    <p class="form-guide">상담 정보를 입력하시면 혜택이 즉시 활성화됩니다.</p>
+                    <div class="input-wrap">
+                        <select id="branch-select">
+                            <option value="부산점">한빔한복 부산점</option>
+                            <option value="센텀점">한빔한복 센텀점</option>
+                        </select>
+                        <input type="text" id="user-name" placeholder="성함">
+                        <input type="tel" id="user-phone" placeholder="연락처">
+                        <button type="button" onclick="handleLeadSubmit()" class="btn-submit">혜택 활성화하기</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<!-- 하단 고정 CTA 바 (폭 1300px 대응) -->
+<div class="fixed-bar" id="cta-bar" style="display:none;">
+    <div class="bar-container">
+        <a href="tel:0516342325" class="bar-btn navy">전화문의</a>
+        <a href="https://open.kakao.com/o/sIrXajUf" class="bar-btn kakao">카톡상담</a>
+        <a href="https://m.booking.naver.com/booking/6/bizes/661812" class="bar-btn naver">네이버예약</a>
+        <a href="https://hanbeam.co.kr" class="bar-btn gold">홈페이지</a>
+    </div>
+</div>
+
+<script src="roulette.js?v=6.0"></script>
+</body>
+</html>
