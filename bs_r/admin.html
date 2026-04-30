@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>한빔한복 | 이벤트 관리 시스템</title>
+    <style>
+        /* 한빔한복 브랜드 아이덴티티 반영 (Navy & Gold) */
+        body { font-family: 'Pretendard', sans-serif; background: #f8f9fa; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: #333; }
+        
+        /* 로그인 섹션 */
+        #login-section { background: #fff; padding: 50px 40px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); width: 100%; max-width: 400px; text-align: center; margin-top: 12vh; border-top: 5px solid #0A1D37; }
+        #login-section h2 { margin-bottom: 30px; font-size: 26px; color: #0A1D37; letter-spacing: -1px; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; font-size: 14px; color: #555; margin-bottom: 8px; font-weight: 600; }
+        .input-group input { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 8px; box-sizing: border-box; outline: none; font-size: 16px; transition: 0.3s; }
+        .input-group input:focus { border-color: #0A1D37; background: #fdfdfd; }
+        .btn-login { width: 100%; padding: 16px; background: #0A1D37; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 15px; font-size: 17px; transition: 0.3s; }
+        .btn-login:hover { background: #1a2a44; transform: translateY(-2px); }
+        
+        /* 관리자 메인 섹션 */
+        #admin-section { display: none; width: 95%; max-width: 1200px; padding: 60px 0; margin: 0 auto; }
+        .admin-card { background: #fff; padding: 40px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; border-bottom: 2px solid #f8f8f8; padding-bottom: 30px; }
+        .header h2 { margin: 0; font-size: 24px; color: #0A1D37; }
+
+        /* 필터 및 검색 */
+        .search-container { margin-bottom: 30px; display: flex; gap: 12px; }
+        .search-input { flex: 1; padding: 15px 25px; border: 1.5px solid #eee; border-radius: 10px; font-size: 16px; outline: none; transition: 0.3s; background: #fcfcfc; }
+        .search-input:focus { border-color: #0A1D37; box-shadow: 0 0 12px rgba(10,29,55,0.05); background: #fff; }
+
+        /* 버튼 */
+        .btn-excel { background: #B8977E; color: #fff; border: none; padding: 14px 25px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 15px; transition: 0.3s; }
+        .btn-excel:hover { background: #a6856c; }
+        .btn-logout { background: #f4f4f4; color: #666; border: none; padding: 14px 25px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 15px; margin-left: 10px; transition: 0.3s; }
+        .btn-logout:hover { background: #eee; color: #333; }
+        
+        /* 데이터 테이블 */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; }
+        th { background: #fcfcfc; padding: 20px 15px; text-align: center; border-bottom: 2px solid #f0f0f0; font-size: 15px; color: #777; font-weight: 600; }
+        td { padding: 20px 15px; border-bottom: 1px solid #f4f4f4; font-size: 15px; text-align: center; word-break: break-all; }
+        .phone-link { color: #0A1D37; text-decoration: none; font-weight: 700; border-bottom: 1px solid #0A1D37; }
+        .prize-tag { background: #fdf5ef; color: #B8977E; padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 14px; border: 1px solid #f5e8de; }
+        tr:hover { background: #fbfbfb; }
+
+        /* 상태 창 */
+        #loading { text-align: center; padding: 60px; color: #aaa; font-size: 16px; }
+        #no-result { display: none; text-align: center; padding: 60px; color: #999; font-size: 16px; }
+
+        @media (max-width: 768px) {
+            .header { flex-direction: column; gap: 20px; align-items: flex-start; }
+            .search-container { flex-direction: column; }
+            th, td { font-size: 13px; padding: 15px 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 로그인 섹션 -->
+    <div id="login-section">
+        <h2 style="letter-spacing: 2px;">HANBEAM<br><span style="font-size: 16px; font-weight: 400; color: #B8977E;">ADMIN DASHBOARD</span></h2>
+        <div class="input-group">
+            <label>관리자 ID</label>
+            <input type="text" id="admin-id" placeholder="ID">
+        </div>
+        <div class="input-group">
+            <label>비밀번호</label>
+            <input type="password" id="admin-pw" placeholder="Password">
+        </div>
+        <button class="btn-login" onclick="handleLogin()">시스템 접속</button>
+    </div>
+
+    <!-- 데이터 대시보드 -->
+    <div id="admin-section">
+        <div class="admin-card">
+            <div class="header">
+                <h2>📊 이벤트 당첨자 실시간 명단</h2>
+                <div>
+                    <button class="btn-excel" onclick="exportToExcel()">엑셀(CSV) 저장</button>
+                    <button class="btn-logout" onclick="handleLogout()">로그아웃</button>
+                </div>
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" onkeyup="filterLeads()" placeholder="고객명, 연락처, 당첨상품으로 검색하세요...">
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th width="20%">참여 일시</th>
+                        <th width="15%">성함</th>
+                        <th width="20%">연락처</th>
+                        <th width="15%">지점</th>
+                        <th width="30%">🎁 당첨 혜택</th>
+                    </tr>
+                </thead>
+                <tbody id="data-list"></tbody>
+            </table>
+            
+            <div id="loading">구글 시트로부터 데이터를 연동하고 있습니다...</div>
+            <div id="no-result">일치하는 신청 내역이 없습니다.</div>
+        </div>
+    </div>
+
+<script>
+    /* ★ 설정: 이전 코드와 동일하게 GAS_URL만 잘 넣어주시면 됩니다 */
+    const ADMIN_CREDENTIALS = { id: "admin", pw: "1234" }; 
+    const GAS_URL = "여기에_구글_웹앱_URL을_넣으세요"; 
+
+    let allLeads = []; 
+
+    function handleLogin() {
+        const idInput = document.getElementById('admin-id').value;
+        const pwInput = document.getElementById('admin-pw').value;
+
+        if (idInput === ADMIN_CREDENTIALS.id && pwInput === ADMIN_CREDENTIALS.pw) {
+            sessionStorage.setItem("isLoggedIn_HB", "true");
+            showAdminPage();
+        } else {
+            alert("관리자 정보가 일치하지 않습니다.");
+        }
+    }
+
+    function handleLogout() {
+        sessionStorage.removeItem("isLoggedIn_HB");
+        location.reload();
+    }
+
+    function showAdminPage() {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('admin-section').style.display = 'block';
+        fetchData();
+    }
+
+    function fetchData() {
+        const loading = document.getElementById('loading');
+        
+        fetch(GAS_URL)
+        .then(res => res.json())
+        .then(data => {
+            loading.style.display = 'none';
+            
+            // 구글 시트 데이터를 최신순으로 정렬하여 배열화
+            // 데이터 순서: [0]성함, [1]연락처, [2]당첨상품, [3]지점, [4]날짜
+            allLeads = data.reverse().map(row => ({
+                name: row[0] || "미입력",
+                phone: row[1] || "미입력",
+                prize: row[2] || "미참여",
+                branch: row[3] || "-",
+                time: row[4] ? new Date(row[4]).toLocaleString('ko-KR') : "-"
+            }));
+            
+            renderTable(allLeads);
+        })
+        .catch(err => {
+            loading.innerText = "데이터 로드 실패. 웹 앱 URL을 확인하세요.";
+            console.error(err);
+        });
+    }
+
+    function renderTable(dataArray) {
+        const tbody = document.getElementById('data-list');
+        const noResult = document.getElementById('no-result');
+        
+        if (dataArray.length === 0) {
+            tbody.innerHTML = "";
+            noResult.style.display = 'block';
+        } else {
+            noResult.style.display = 'none';
+            tbody.innerHTML = dataArray.map(l => `
+                <tr>
+                    <td style="color:#888; font-size:13px;">${l.time}</td>
+                    <td style="font-weight:700; color:#333;">${l.name}</td>
+                    <td><a href="tel:${l.phone}" class="phone-link">${l.phone}</a></td>
+                    <td><span style="font-size:14px; color:#666;">${l.branch}</span></td>
+                    <td><span class="prize-tag">${l.prize}</span></td> 
+                </tr>
+            `).join('');
+        }
+    }
+
+    function filterLeads() {
+        const query = document.getElementById('search-input').value.toLowerCase();
+        const filtered = allLeads.filter(lead => 
+            lead.name.toLowerCase().includes(query) || 
+            lead.phone.includes(query) ||
+            lead.prize.toLowerCase().includes(query) ||
+            lead.branch.toLowerCase().includes(query)
+        );
+        renderTable(filtered);
+    }
+
+    function exportToExcel() {
+        if(allLeads.length === 0) return alert("다운로드할 데이터가 없습니다.");
+
+        let csv = "\uFEFF참여시간,이름,연락처,지점,당첨상품\n";
+        allLeads.forEach(l => { 
+            csv += `${l.time},${l.name},${l.phone},${l.branch},${l.prize}\n`; 
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute("download", "한빔한복_이벤트_당첨자_명단.csv");
+        link.click();
+    }
+
+    document.getElementById('admin-pw').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') handleLogin();
+    });
+
+    window.onload = function() {
+        if (sessionStorage.getItem("isLoggedIn_HB") === "true") {
+            showAdminPage();
+        }
+    };
+</script>
+
+</body>
+</html>

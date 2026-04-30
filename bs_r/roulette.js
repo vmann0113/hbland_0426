@@ -1,5 +1,6 @@
 /* 
- * 한빔한복 프리미엄 이벤트 - 최종 통합 스크립트
+ * 한빔한복 프리미엄 이벤트 - GitHub & 구글 시트 연동 최종 마스터 스크립트
+ * 설계: 홈페이지 제작 전문가
  */
 
 let isSpinning = false;
@@ -22,13 +23,14 @@ if (phoneInput) {
     });
 }
 
-// [2. 룰렛 실행 엔진]
+// [2. 룰렛 실행 엔진 - 정교한 확률 로직]
 function spinEngine() {
     if (isSpinning) return;
     const disk = document.getElementById("roulette-disk");
     if (!disk) return;
     isSpinning = true;
     
+    // w: 가중치(합 100 기준 확률%)
     const prizes = [
         { name: "25만원(본식) 할인", a: 0,   w: 1 },   
         { name: "10만원(촬영/본식) 할인", a: 60,  w: 35 }, 
@@ -66,49 +68,50 @@ function spinEngine() {
     }, 4500);
 }
 
-// [3. 데이터 전송 및 중복 체크 응답 처리]
+// [3. 데이터 전송 및 구글 시트 연동 로직]
 function handleLeadSubmit() {
     const nameVal = document.getElementById('user-name').value.trim();
     const phoneVal = document.getElementById('user-phone').value.trim();
     const branchVal = document.getElementById('branch-select').value;
     
+    // 프론트엔드 1차 검증
     if(!nameVal) return alert("성함을 입력해주세요.");
-    
     const purePhone = phoneVal.replace(/-/g, "");
     if(purePhone.length < 11) {
         return alert("연락처를 정확히 작성해주세요. (11자리 필수)");
     }
 
-    const fd = new FormData();
-    fd.append('name', nameVal); 
-    fd.append('phone', phoneVal); 
-    fd.append('prize', prizeResult); 
-    fd.append('branch', branchVal);
+    // ★ 중요: 구글 앱스 스크립트(GAS) 배포 후 생성된 웹 앱 URL을 여기에 넣으세요.
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxJwTVpsdJ64hihl9yV9yM5NpNVVL1_AN57_5UsGl8VIiP1RyORXmKOooDc609LO2E5/exec"; 
 
-    // ★ 파일명을 save_db.php로 고정했습니다.
-    fetch('../save_db.php', { method: 'POST', body: fd })
-    .then(response => {
-        // 서버에서 PHP 에러가 나거나 파일이 없으면 여기서 catch로 던집니다.
-        if (!response.ok) throw new Error("HTTP 에러 발생");
-        return response.json();
-    })
+    // GitHub 환경에서 CORS 이슈를 방지하기 위해 URLSearchParams 방식을 사용합니다.
+    const finalURL = `${GAS_URL}?name=${encodeURIComponent(nameVal)}&phone=${encodeURIComponent(phoneVal)}&prize=${encodeURIComponent(prizeResult)}&branch=${encodeURIComponent(branchVal)}`;
+
+    // 제출 버튼 상태 변경 (중복 클릭 방지)
+    const btn = document.querySelector('.btn-submit');
+    btn.innerText = "처리 중...";
+    btn.disabled = true;
+
+    fetch(finalURL)
+    .then(response => response.json())
     .then(data => {
-        if(data.status === "success") {
+        if(data.result === "success") {
             alert("혜택이 성공적으로 활성화되었습니다!");
             document.getElementById('cta-bar').style.display = 'block';
-            const btn = document.querySelector('.btn-submit');
             btn.innerText = "활성화 완료";
-            btn.disabled = true;
             btn.style.background = "#ccc";
-        } else if(data.status === "duplicate") {
+        } else if(data.result === "duplicate") {
             alert("이미 혜택을 활성화하셨습니다. (1인 1회 참여 가능)");
+            btn.innerText = "이미 신청됨";
+            btn.style.background = "#ccc";
         } else {
-            alert("DB 오류: " + data.message);
+            throw new Error();
         }
     })
     .catch(err => {
-        // 경로가 틀렸거나 PHP 문법 오류가 있을 때 실행됩니다.
-        console.error("전송 에러 상세:", err);
-        alert("통신이 원활하지 않습니다. 서버에 'save_db.php' 파일이 있는지, DB 정보가 맞는지 확인해주세요.");
+        console.error("전송 에러:", err);
+        alert("통신이 원활하지 않습니다. 구글 시트 연동 상태를 확인해주세요.");
+        btn.innerText = "혜택 활성화하기";
+        btn.disabled = false;
     });
 }
