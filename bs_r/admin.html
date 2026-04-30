@@ -133,32 +133,35 @@
         fetchData();
     }
 
-    function fetchData() {
-        const loading = document.getElementById('loading');
-        
-        fetch(GAS_URL)
-        .then(res => res.json())
-        .then(data => {
-            loading.style.display = 'none';
-            
-            // 구글 시트 데이터를 최신순으로 정렬하여 배열화
-            // 데이터 순서: [0]성함, [1]연락처, [2]당첨상품, [3]지점, [4]날짜
-            allLeads = data.reverse().map(row => ({
-                name: row[0] || "미입력",
-                phone: row[1] || "미입력",
-                prize: row[2] || "미참여",
-                branch: row[3] || "-",
-                time: row[4] ? new Date(row[4]).toLocaleString('ko-KR') : "-"
-            }));
-            
-            renderTable(allLeads);
-        })
-        .catch(err => {
-            loading.innerText = "데이터 로드 실패. 웹 앱 URL을 확인하세요.";
-            console.error(err);
-        });
-    }
+    /* admin.html 수정 핵심 로직 */
+function fetchData() {
+    const loading = document.getElementById('loading');
+    const GAS_URL = "여기에_새로_배포한_URL_넣으세요"; 
 
+    // GAS의 doPost를 실행시키기 위해 POST 방식으로 호출합니다.
+    fetch(GAS_URL, { method: 'POST' })
+    .then(res => res.json())
+    .then(data => {
+        loading.style.display = 'none';
+        if (!data || data.length === 0) {
+            allLeads = [];
+        } else {
+            // 데이터 매핑: [0]성함, [1]연락처, [2]당첨상품, [3]지점, [4]날짜
+            allLeads = data.reverse().map(row => ({
+                name: row[0] || "-",
+                phone: row[1] || "-",
+                prize: row[2] || "-",
+                branch: row[3] || "-",
+                time: row[4] || "-"
+            }));
+        }
+        renderTable(allLeads);
+    })
+    .catch(err => {
+        loading.innerText = "데이터 연동 실패. URL과 권한 설정을 확인하세요.";
+        console.error(err);
+    });
+}
     function renderTable(dataArray) {
         const tbody = document.getElementById('data-list');
         const noResult = document.getElementById('no-result');
