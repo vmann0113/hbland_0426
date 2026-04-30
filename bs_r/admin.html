@@ -106,7 +106,7 @@
 <script>
     /* ★ 설정: 이전 코드와 동일하게 GAS_URL만 잘 넣어주시면 됩니다 */
     const ADMIN_CREDENTIALS = { id: "admin", pw: "1234" }; 
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxJwTVpsdJ64hihl9yV9yM5NpNVVL1_AN57_5UsGl8VIiP1RyORXmKOooDc609LO2E5/exec"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzFX0_bpw0It_r6uon9km3qzfYjnoCwoZx_y5GsOwyDcJCUSlcxhHCbXs2FwmoNyhvE/exec"; 
 
     let allLeads = []; 
 
@@ -136,7 +136,7 @@
     /* admin.html 수정 핵심 로직 */
 function fetchData() {
     const loading = document.getElementById('loading');
-    const GAS_URL = "여기에_새로_배포한_URL_넣으세요"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzFX0_bpw0It_r6uon9km3qzfYjnoCwoZx_y5GsOwyDcJCUSlcxhHCbXs2FwmoNyhvE/exec"; 
 
     // GAS의 doPost를 실행시키기 위해 POST 방식으로 호출합니다.
     fetch(GAS_URL, { method: 'POST' })

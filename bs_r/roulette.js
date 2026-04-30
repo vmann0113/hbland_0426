@@ -74,7 +74,7 @@ function handleLeadSubmit() {
     const purePhone = phoneVal.replace(/-/g, "");
     if(purePhone.length < 11) return alert("연락처를 정확히 작성해주세요.");
 
-    const GAS_URL = "여기에_새로_배포한_URL_넣으세요"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzFX0_bpw0It_r6uon9km3qzfYjnoCwoZx_y5GsOwyDcJCUSlcxhHCbXs2FwmoNyhvE/exec"; 
     const finalURL = `${GAS_URL}?name=${encodeURIComponent(nameVal)}&phone=${encodeURIComponent(phoneVal)}&prize=${encodeURIComponent(prizeResult)}&branch=${encodeURIComponent(branchVal)}`;
 
     const btn = document.querySelector('.btn-submit');
