@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="ko"> 
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no, address=no, email=no">
+    <title>한빔한복 창원/마산 통합 예약센터</title>
+    <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=p92c8gq59k"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+    <style>
+        :root { 
+            --hb-navy: #0A1D37; --hb-gold: #B8977E; --hb-bg-gray: #eeeef1; 
+            --hb-line-blue: #1b4b9b; --pc-max-width: 1300px; --naver-green: #03C75A;
+            --kakao-yellow: #FEE500;
+        }
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        body { margin: 0; font-family: 'Pretendard', sans-serif; background-color: var(--hb-bg-gray); display: flex; flex-direction: column; align-items: center; }
+
+        .main-wrapper { width: 100%; max-width: var(--pc-max-width); background-color: transparent; }
+
+        .hero-feed img { width: 100%; height: auto; display: block; }
+
+        .info-sec { padding: 80px 20px; text-align: center; }
+        .info-sec h2 { font-size: 3.5rem; color: var(--hb-navy); margin-bottom: 50px; font-weight: 800; letter-spacing: -2px; }
+        .dual-map-container { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; width: 100%; max-width: 1200px; margin: 0 auto; }
+        .map-card { background: #fff; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .map-card h3 { font-size: 2.2rem; margin-bottom: 20px; color: var(--hb-navy); }
+        .naver-map { width: 100%; height: 400px; border-radius: 12px; }
+        .addr-text { font-size: 1.4rem; color: #555; margin-top: 20px; font-weight: 600; line-height: 1.4; min-height: 3em; }
+
+        .reservation-title-bar { width: 100%; background-color: var(--hb-line-blue); padding: 40px 20px; display: flex; align-items: center; justify-content: center; margin-top: 60px; overflow: hidden; }
+        .title-text { color: #ffffff; font-size: 3.2rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 20px; white-space: nowrap; letter-spacing: -1.5px; }
+        .naver-logo-img { height: 52px; width: auto; display: block; }
+
+        .branch-grid-sec { padding: 80px 20px 150px; text-align: center; }
+        .branch-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; width: 100%; max-width: 1150px; margin: 0 auto; }
+        .branch-link { display: flex; align-items: center; justify-content: center; background: #fff; border: 3px solid var(--hb-line-blue); color: var(--hb-line-blue); text-decoration: none; height: 120px; border-radius: 15px; font-size: 2.6rem; font-weight: 900; }
+
+        footer { padding: 120px 20px 220px; background: #222; color: #bbb; text-align: center; width: 100%; line-height: 2; pointer-events: auto; }
+        footer, footer span, footer div { color: #bbb !important; text-decoration: none !important; }
+        .hb-footerLogo { height: 150px; width: auto; margin-bottom: 40px; filter: brightness(0) invert(1); }
+        .biz-item { border-bottom: 1px solid #444; padding-bottom: 20px; margin-bottom: 20px; color: #bbb; }
+        .ft-strong { font-size: 1.4rem; font-weight: 700; color: #fff !important; display: block; margin-bottom: 5px; }
+
+        .fixed-cta { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: var(--pc-max-width); background: #fff; display: flex; padding: 15px; gap: 12px; box-shadow: 0 -5px 25px rgba(0,0,0,0.15); z-index: 1000; }
+        .cta-btn { flex: 1; height: 90px; display: flex; align-items: center; justify-content: center; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 1.8rem; border: none; cursor: pointer; }
+        .btn-call { background: var(--hb-navy); color: #fff; }
+        .btn-kakao { background: var(--kakao-yellow); color: #3C1E1E; }
+        .btn-reserve { background: var(--naver-green); color: #fff; }
+        .btn-home { background: var(--hb-gold); color: #fff; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
+        .modal-content { background: #fff; width: 100%; max-width: 600px; border-radius: 20px; padding: 50px 40px; text-align: center; }
+        .modal-content h4 { font-size: 2.2rem; margin-bottom: 30px; color: var(--hb-navy); letter-spacing: -1px; }
+        .modal-btns { display: flex; flex-direction: column; gap: 15px; }
+        .modal-btn { height: 90px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 2rem; font-weight: 800; text-decoration: none; color: #fff; }
+        .modal-close { margin-top: 50px; display: inline-block; color: #999; text-decoration: underline; cursor: pointer; font-size: 1.4rem; }
+
+        /* 이벤트 스타일 */
+        .roulette-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .roulette-box { width: 90%; max-width: 450px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .roulette-box img { width: 100%; height: auto; display: block; }
+        .disk-wrapper { position: relative; width: 320px; height: 320px; margin: 0 auto; }
+        .roulette-pointer-img { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 50px !important; z-index: 10; }
+        .roulette-disk-img { width: 100% !important; height: 100% !important; transition: transform 4.5s cubic-bezier(0.15, 0, 0.15, 1); }
+        .btn-start { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70px; height: 70px; background: transparent; border: none; cursor: pointer; z-index: 20; }
+        .event-form-sec { width: 100%; background: #fff; padding: 100px 20px; border-top: 1px solid #ddd; display: none; }
+        .form-inner { max-width: 500px; margin: 0 auto; text-align: center; }
+        .prize-res-text { font-size: 2.2rem; color: var(--hb-gold); font-weight: 800; margin-bottom: 40px; display: block; letter-spacing: -1px; }
+        .ev-input { width: 100%; height: 80px; border: 2px solid #eee; border-radius: 12px; padding: 0 20px; font-size: 1.5rem; margin-bottom: 15px; outline: none; transition: 0.3s; }
+        .ev-input:focus { border-color: var(--hb-gold); }
+        .ev-select { width: 100%; height: 80px; border: 2px solid #eee; border-radius: 12px; padding: 0 20px; font-size: 1.5rem; margin-bottom: 25px; background: #fff; appearance: none; }
+        .ev-btn { width: 100%; height: 90px; background: var(--hb-navy); color: #fff; border: none; border-radius: 12px; font-size: 1.8rem; font-weight: 800; cursor: pointer; }
+
+        @media (max-width: 768px) {
+            .disk-wrapper { width: 280px; height: 280px; }
+            .prize-res-text { font-size: 1.6rem; }
+            .ev-input, .ev-select { height: 60px; font-size: 1.1rem; }
+            .ev-btn { height: 70px; font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="evOverlay" class="roulette-overlay">
+    <div class="roulette-box">
+        <img src="/assets/roulette_title.png" alt="타이틀">
+        <div class="disk-wrapper">
+            <img src="/assets/roulette_pointer.png" class="roulette-pointer-img" alt="포인터">
+            <img id="evDisk" src="/assets/roulette_disk.png" class="roulette-disk-img" alt="디스크">
+            <button class="btn-start" onclick="runSpin()"></button>
+        </div>
+        <img src="/assets/roulette_info.png" alt="하단정보">
+        <div onclick="document.getElementById('evOverlay').style.display='none'" style="color:#888; text-decoration:underline; cursor:pointer; font-size:14px; margin-top:10px;">나중에 참여하기</div>
+    </div>
+</div>
+
+<div class="main-wrapper">
+    <section class="hero-feed">
+        <img src="/assets/01.webp"><img src="/assets/02.webp"><img src="/assets/03.webp">
+        <img src="/assets/04.webp"><img src="/assets/05.webp"><img src="/assets/06.webp">
+    </section>
+
+    <section class="info-sec">
+        <h2>한빔한복 창원/마산점 위치안내</h2>
+        <div class="dual-map-container">
+            <div class="map-card">
+                <h3>창원점</h3>
+                <div id="map_changwon" class="naver-map"></div>
+                <p class="addr-text">경상남도 창원시 성산구 동산로 208-2, 1층(사파동)</p>
+            </div>
+            <div class="map-card">
+                <h3>마산점</h3>
+                <div id="map_masan" class="naver-map"></div>
+                <p class="addr-text">창원시 마산합포구 합포로 236, 1층 105호 (산호동)</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="reservation-title-bar">
+        <div class="title-text">
+            전국 지점별 <img src="/assets/naver_logo.png" class="naver-logo-img"> 예약링크
+        </div>
+    </div>
+
+    <section class="branch-grid-sec">
+        <div class="branch-grid" id="branchGrid"></div>
+    </section>
+
+    <section id="evFormSec" class="event-form-sec">
+        <div class="form-inner">
+            <h3 style="font-size:2rem; color:#0A1D37; margin-bottom:10px;">🎊 당첨을 축하드립니다!</h3>
+            <h3 style="font-size:1rem; color:#1b2129; margin-bottom:10px;">당첨금/사은품은 한복계약시 사용가능합니다.</h3>
+            <span id="evPrizeText" class="prize-res-text"></span>
+            
+            <input type="text" id="evName" class="ev-input" placeholder="성함">
+            <input type="text" id="evPhone" class="ev-input" placeholder="연락처 (11자리)" maxlength="13">
+            
+            <select id="evBranch" class="ev-select">
+                <option value="창원점">상담 희망 지점: 창원점</option>
+                <option value="마산점">상담 희망 지점: 마산점</option>
+            </select>
+            
+            <button class="ev-btn" onclick="submitEvData()">혜택받기</button>
+        </div>
+    </section>
+
+    <footer>
+        <img class="hb-footerLogo" src="/assets/footer_logo.png">
+        <div class="biz-item">
+            <span class="ft-strong">한빔한복 창원점</span>
+            대표자: 이은수 | 등록번호: 537-02-01903 | TEL.055-263-2325
+        </div>
+        <div class="biz-item">
+            <span class="ft-strong">한빔한복 마산점</span>
+            대표자: 김미경 | 등록번호: 405-03-97036 | TEL.010-8832-2325
+        </div>
+        <div style="color:#666; margin-top:20px;">ⓒ Hanbim Hanbok</div>
+    </footer>
+</div>
+
+<div class="fixed-cta">
+    <button onclick="openModal('call')" class="cta-btn btn-call">전화상담</button>
+    <button onclick="openModal('kakao')" class="cta-btn btn-kakao">카톡문의</button>
+    <button onclick="openModal('reserve')" class="cta-btn btn-reserve">네이버예약</button>
+    <a href="https://hanbeam.co.kr" class="cta-btn btn-home">홈페이지</a>
+</div>
+
+<div id="selectModal" class="modal-overlay" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <h4 id="modalTitle">문의하실 지점을 선택해주세요</h4>
+        <div class="modal-btns">
+            <a href="" id="btnCW" class="modal-btn" style="background: var(--hb-navy);">창원점</a>
+            <a href="" id="btnMS" class="modal-btn" style="background: var(--hb-line-blue);">마산점</a>
+        </div>
+        <div class="modal-close" onclick="closeModal()">닫기</div>
+    </div>
+</div>
+
+<script>
+    // [이벤트 변수 선언]
+    let isEvRunning = false;
+    let evResult = "";
+
+    const BRANCH_LIST = [
+        { name: "부산점", url: "https://m.booking.naver.com/booking/6/bizes/661812" },
+        { name: "센텀점", url: "https://booking.naver.com/booking/6/bizes/1577219" },
+        { name: "울산점", url: "https://booking.naver.com/booking/6/bizes/1534767" },
+        { name: "김해점", url: "https://booking.naver.com/booking/6/bizes/1402679" },
+        { name: "양산점", url: "https://booking.naver.com/booking/13/bizes/868629" },
+        { name: "창원점", url: "https://booking.naver.com/booking/6/bizes/843111" },
+        { name: "마산점", url: "https://booking.naver.com/booking/6/bizes/1526541" },
+        { name: "진주점", url: "https://m.booking.naver.com/booking/6/bizes/1485854" },
+        { name: "인천점", url: "https://m.booking.naver.com/booking/13/bizes/1039475" },
+        { name: "안산점", url: "https://m.booking.naver.com/booking/6/bizes/1500008" },
+        { name: "대구점", url: "https://m.place.naver.com/place/2043617700/ticket" }
+    ];
+
+    const LINKS = {
+        call: { cw: "tel:0552632325", ms: "tel:01088322325", title: "전화상담 지점 선택", colorBS: "#0A1D37", colorCT: "#1b4b9b" },
+        kakao: { cw: "https://open.kakao.com/o/sdcvbh5e", ms: "https://open.kakao.com/o/ssWvuvYh", title: "카톡문의 지점 선택", colorBS: "#FEE500", colorCT: "#FEE500", text: "#3C1E1E" },
+        reserve: { cw: "https://booking.naver.com/booking/6/bizes/843111", ms: "https://booking.naver.com/booking/6/bizes/1526541", title: "네이버예약 지점 선택", colorBS: "#03C75A", colorCT: "#03C75A" }
+    };
+
+    function init() {
+        const grid = document.getElementById('branchGrid');
+        BRANCH_LIST.forEach(b => {
+            const a = document.createElement('a'); a.className = 'branch-link'; a.href = b.url; a.target = '_blank'; a.innerText = b.name; grid.appendChild(a);
+        });
+
+        const mapCW = new naver.maps.Map('map_changwon', { center: new naver.maps.LatLng(35.2274, 128.6811), zoom: 16 });
+        new naver.maps.Marker({ position: new naver.maps.LatLng(35.2274, 128.6811), map: mapCW });
+
+        const mapMS = new naver.maps.Map('map_masan', { center: new naver.maps.LatLng(35.2201, 128.5744), zoom: 16 });
+        new naver.maps.Marker({ position: new naver.maps.LatLng(35.2201, 128.5744), map: mapMS });
+
+        // 연락처 자동 하이픈 로직 (DOM 로드 후 등록)
+        const evPhoneInput = document.getElementById('evPhone');
+        if(evPhoneInput) {
+            evPhoneInput.addEventListener('input', function(e) {
+                let v = e.target.value.replace(/[^0-9]/g, ""); 
+                if (v.length > 11) v = v.substring(0, 11); 
+                if (v.length < 4) e.target.value = v; 
+                else if (v.length < 8) e.target.value = v.substr(0, 3) + "-" + v.substr(3); 
+                else e.target.value = v.substr(0, 3) + "-" + v.substr(3, 4) + "-" + v.substr(7);
+            });
+        }
+    }
+
+    function runSpin() {
+        if (isEvRunning) return;
+        isEvRunning = true;
+        const disk = document.getElementById("evDisk");
+        
+        const prizes = [
+            { name: "25만원 할인", a: 0, w: 1 }, { name: "10만원 할인", a: 60, w: 35 }, 
+            { name: "20만원 할인", a: 120, w: 4 }, { name: "진주귀걸이 증정", a: 180, w: 20 },  
+            { name: "5만원 할인", a: 240, w: 35 }, { name: "15만원 할인", a: 300, w: 5 }    
+        ];
+        const totalW = prizes.reduce((acc, p) => acc + p.w, 0);
+        let rand = Math.random() * totalW;
+        let selected = prizes[0];
+        for (let i = 0; i < prizes.length; i++) {
+            if (rand < prizes[i].w) { selected = prizes[i]; break; }
+            rand -= prizes[i].w;
+        }
+
+        const rotate = 3600 + (360 - selected.a);
+        disk.style.transform = `rotate(${rotate}deg)`;
+
+        setTimeout(() => {
+            evResult = selected.name;
+            alert(`🎊 축하합니다! [${evResult}] 당첨!`);
+            document.getElementById('evOverlay').style.display = 'none';
+            document.getElementById('evFormSec').style.display = 'block';
+            document.getElementById('evPrizeText').innerText = "당첨 혜택 : " + evResult;
+            document.getElementById('evFormSec').scrollIntoView({ behavior: 'smooth' });
+            isEvRunning = false;
+        }, 4500);
+    }
+
+    function submitEvData() {
+        const name = document.getElementById('evName').value.trim();
+        const phone = document.getElementById('evPhone').value.trim();
+        const branch = document.getElementById('evBranch').value;
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxJwTVpsdJ64hihl9yV9yM5NpNVVL1_AN57_5UsGl8VIiP1RyORXmKOooDc609LO2E5/exec"; 
+
+        if(!name || phone.replace(/-/g, "").length < 11) return alert("성함과 연락처를 정확히 입력해주세요.");
+
+        const finalURL = `${GAS_URL}?name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&prize=${encodeURIComponent(evResult)}&branch=${encodeURIComponent(branch)}`;
+        
+        const btn = document.querySelector('.ev-btn');
+        btn.innerText = "처리 중..."; btn.disabled = true;
+
+        fetch(finalURL)
+    .then(res => res.json())
+    .then(data => {
+        if(data.result === "success") {
+            alert("프리미엄 혜택이 성공적으로 신청되었습니다! 담당자가 빠른 시일 내 연락드리겠습니다!");
+            btn.innerText = "혜택 신청 완료";
+        } else if(data.result === "duplicate") {
+            alert("이미 참여하신 내역이 있습니다.");
+            btn.innerText = "참여 완료";
+        }
+    })
+        .catch(() => {
+            alert("신청이 완료되었습니다. 확인 후 연락드리겠습니다.");
+            btn.innerText = "신청 완료";
+        });
+    }
+
+    function openModal(type) {
+        const data = LINKS[type];
+        const btnCW = document.getElementById('btnCW');
+        const btnMS = document.getElementById('btnMS');
+        document.getElementById('modalTitle').innerText = data.title;
+        btnCW.href = data.cw; btnCW.style.background = data.colorBS; btnCW.style.color = data.text || "#fff";
+        btnCW.innerText = "창원점 " + (type === 'call' ? "전화하기" : type === 'kakao' ? "카톡하기" : "예약하기");
+        btnMS.href = data.ms; btnMS.style.background = data.colorCT; btnMS.style.color = data.text || "#fff";
+        btnMS.innerText = "마산점 " + (type === 'call' ? "전화하기" : type === 'kakao' ? "카톡하기" : "예약하기");
+        document.getElementById('selectModal').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('selectModal').style.display = 'none'; }
+    window.onload = init;
+</script>
+</body>
+</html>
