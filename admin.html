@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한빔한복 | 이벤트 관리 시스템</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+    <style>
+        /* [UI/UX 디자인] 한빔한복 브랜드 아이덴티티 반영 */
+        :root { --hb-navy: #0A1D37; --hb-gold: #B8977E; --hb-bg: #f8f9fa; }
+        
+        body { font-family: 'Pretendard', sans-serif; background: var(--hb-bg); margin: 0; padding: 0; color: #333; }
+        
+        /* 로그인 섹션 */
+        #login-section { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+        .login-card { background: #fff; padding: 50px 40px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; border-top: 6px solid var(--hb-navy); }
+        .login-card h2 { margin-bottom: 30px; font-size: 24px; color: var(--hb-navy); letter-spacing: -1px; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; font-size: 14px; color: #666; margin-bottom: 8px; font-weight: 600; }
+        .input-group input { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 8px; box-sizing: border-box; font-size: 16px; outline: none; }
+        .input-group input:focus { border-color: var(--hb-gold); }
+        .btn-login { width: 100%; padding: 16px; background: var(--hb-navy); color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 17px; transition: 0.3s; }
+        .btn-login:hover { background: #1a2a44; transform: translateY(-2px); }
+
+        /* 관리자 대시보드 섹션 */
+        #admin-section { display: none; width: 95%; max-width: 1200px; margin: 50px auto; }
+        .admin-card { background: #fff; padding: 40px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; border-bottom: 2px solid #f4f4f4; padding-bottom: 25px; }
+        .header h2 { margin: 0; font-size: 22px; color: var(--hb-navy); }
+
+        .search-container { margin-bottom: 30px; display: flex; gap: 10px; }
+        .search-input { flex: 1; padding: 15px 20px; border: 1.5px solid #eee; border-radius: 10px; font-size: 15px; outline: none; }
+        .search-input:focus { border-color: var(--hb-navy); }
+
+        .btn-excel { background: var(--hb-gold); color: #fff; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 700; }
+        .btn-logout { background: #f4f4f4; color: #666; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; margin-left: 10px; }
+        
+        /* 테이블 스타일 */
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { background: #fcfcfc; padding: 18px 10px; text-align: center; border-bottom: 2px solid #f0f0f0; color: #777; font-size: 14px; }
+        td { padding: 18px 10px; border-bottom: 1px solid #f8f8f8; text-align: center; font-size: 15px; }
+        .phone-link { color: var(--hb-navy); text-decoration: none; font-weight: 700; border-bottom: 1px solid var(--hb-navy); }
+        .prize-tag { background: #fdf5ef; color: var(--hb-gold); padding: 5px 12px; border-radius: 6px; font-weight: 700; font-size: 13px; }
+        tr:hover { background: #fafafa; }
+
+        #loading, #no-result { text-align: center; padding: 50px; color: #aaa; font-size: 16px; }
+
+        @media (max-width: 768px) {
+            .header { flex-direction: column; gap: 20px; align-items: flex-start; }
+            .admin-card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- [1] 로그인 섹션 -->
+    <div id="login-section">
+        <div class="login-card">
+            <h2>HANBEAM ADMIN</h2>
+            <div class="input-group">
+                <label>아이디</label>
+                <input type="text" id="admin-id" placeholder="ID">
+            </div>
+            <div class="input-group">
+                <label>비밀번호</label>
+                <input type="password" id="admin-pw" placeholder="Password">
+            </div>
+            <button class="btn-login" onclick="handleLogin()">관리자 접속</button>
+        </div>
+    </div>
+
+    <!-- [2] 관리자 대시보드 섹션 -->
+    <div id="admin-section">
+        <div class="admin-card">
+            <div class="header">
+                <h2>📊 실시간 당첨자 명단</h2>
+                <div>
+                    <button class="btn-excel" onclick="exportToExcel()">엑셀 다운로드</button>
+                    <button class="btn-logout" onclick="handleLogout()">로그아웃</button>
+                </div>
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" onkeyup="filterLeads()" placeholder="고객명, 연락처, 당첨상품으로 검색...">
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="20%">참여 일시</th>
+                            <th width="15%">성함</th>
+                            <th width="20%">연락처</th>
+                            <th width="15%">지점</th>
+                            <th width="30%">🎁 당첨 혜택</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-list"></tbody>
+                </table>
+            </div>
+            
+            <div id="loading">데이터를 불러오는 중입니다...</div>
+            <div id="no-result" style="display:none;">신청 내역이 없습니다.</div>
+        </div>
+    </div>
+
+<script>
+    /* ★ 설정: 본인의 구글 웹 앱 URL을 넣으세요 */
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzFX0_bpw0It_r6uon9km3qzfYjnoCwoZx_y5GsOwyDcJCUSlcxhHCbXs2FwmoNyhvE/exec"; 
+    const ADMIN_CREDENTIALS = { id: "admin", pw: "1234" }; 
+
+    let allLeads = []; 
+
+    // 로그인 로직
+    function handleLogin() {
+        const id = document.getElementById('admin-id').value;
+        const pw = document.getElementById('admin-pw').value;
+
+        if (id === ADMIN_CREDENTIALS.id && pw === ADMIN_CREDENTIALS.pw) {
+            sessionStorage.setItem("hb_admin_auth", "true");
+            showAdminPage();
+        } else {
+            alert("정보가 일치하지 않습니다.");
+        }
+    }
+
+    function handleLogout() {
+        sessionStorage.removeItem("hb_admin_auth");
+        location.reload();
+    }
+
+    function showAdminPage() {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('admin-section').style.display = 'block';
+        fetchData();
+    }
+
+    // 데이터 호출 (doPost 실행)
+    function fetchData() {
+        fetch(GAS_URL, { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('loading').style.display = 'none';
+            if (!data || data.length === 0) {
+                allLeads = [];
+                document.getElementById('no-result').style.display = 'block';
+            } else {
+                // 구글 시트 데이터를 최신순으로 정렬
+                allLeads = data.reverse().map(row => ({
+                    name: row[0] || "-",
+                    phone: row[1] || "-",
+                    prize: row[2] || "-",
+                    branch: row[3] || "-",
+                    time: row[4] || "-"
+                }));
+                renderTable(allLeads);
+            }
+        })
+        .catch(err => {
+            document.getElementById('loading').innerText = "연동 실패. URL을 확인하세요.";
+            console.error(err);
+        });
+    }
+
+    function renderTable(dataArray) {
+        const tbody = document.getElementById('data-list');
+        const noResult = document.getElementById('no-result');
+        
+        if (dataArray.length === 0) {
+            tbody.innerHTML = "";
+            noResult.style.display = 'block';
+        } else {
+            noResult.style.display = 'none';
+            tbody.innerHTML = dataArray.map(l => `
+                <tr>
+                    <td style="color:#888; font-size:13px;">${l.time}</td>
+                    <td style="font-weight:700;">${l.name}</td>
+                    <td><a href="tel:${l.phone}" class="phone-link">${l.phone}</a></td>
+                    <td>${l.branch}</td>
+                    <td><span class="prize-tag">${l.prize}</span></td> 
+                </tr>
+            `).join('');
+        }
+    }
+
+    function filterLeads() {
+        const query = document.getElementById('search-input').value.toLowerCase();
+        const filtered = allLeads.filter(l => 
+            l.name.toLowerCase().includes(query) || 
+            l.phone.includes(query) ||
+            l.prize.toLowerCase().includes(query)
+        );
+        renderTable(filtered);
+    }
+
+    function exportToExcel() {
+        if(allLeads.length === 0) return alert("데이터가 없습니다.");
+        let csv = "\uFEFF참여시간,이름,연락처,지점,당첨상품\n";
+        allLeads.forEach(l => { 
+            csv += `${l.time},${l.name},${l.phone},${l.branch},${l.prize}\n`; 
+        });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute("download", "한빔한복_당첨자명단.csv");
+        link.click();
+    }
+
+    // 엔터키 로그인 지원
+    document.getElementById('admin-pw').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleLogin();
+    });
+
+    // 세션 유지 확인
+    window.onload = function() {
+        if (sessionStorage.getItem("hb_admin_auth") === "true") {
+            showAdminPage();
+        }
+    };
+</script>
+
+</body>
+</html>
