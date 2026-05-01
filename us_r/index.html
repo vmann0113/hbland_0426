@@ -39,96 +39,62 @@
         .branch-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; width: 100%; max-width: 1150px; margin: 0 auto; }
         .branch-link { display: flex; align-items: center; justify-content: center; background: #fff; border: 3px solid var(--hb-line-blue); color: var(--hb-line-blue); text-decoration: none; height: 120px; border-radius: 15px; font-size: 2.6rem; font-weight: 900; }
 
-        /* [이벤트 전용 CSS - 모바일 잘림 방지 마스터 버전] */
-.roulette-overlay { 
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    background: rgba(0,0,0,0.85); 
-    display: flex; 
-    justify-content: center; 
-    /* 핵심: 중앙 정렬 대신 상단 정렬을 기본으로 하고 스크롤 허용 */
-    align-items: flex-start; 
-    overflow-y: auto; 
-    padding: 60px 0; /* 상하단 세이프 패딩 */
-    z-index: 9999; 
-    -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
-}
+        /* [이벤트 전용 CSS - 상단 잘림 방지 및 입력폼 복구] */
+        .roulette-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.85); display: flex; justify-content: center; 
+            align-items: flex-start; /* 상단 잘림 방지 핵심 */
+            overflow-y: auto; padding: 60px 0; z-index: 9999; 
+            -webkit-overflow-scrolling: touch; 
+        }
+        .roulette-box { 
+            width: 90%; max-width: 450px; margin: auto; /* 화면 높이에 따른 유동 정렬 */
+            text-align: center; display: flex; flex-direction: column; 
+            align-items: center; gap: 20px; 
+        }
+        .roulette-box img { width: 100%; height: auto; display: block; }
 
-.roulette-box { 
-    width: 90%; 
-    max-width: 450px; 
-    /* 핵심: 화면 높이가 여유 있으면 중앙, 부족하면 상단부터 배치 */
-    margin: auto; 
-    text-align: center; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    gap: 20px; 
-    position: relative;
-}
+        .disk-wrapper { 
+            position: relative; width: 320px; height: 320px; 
+            margin: 0 auto; flex-shrink: 0; 
+        }
+        .roulette-pointer-img { 
+            position: absolute; top: -20px; left: 50%; transform: translateX(-50%); 
+            width: 50px !important; z-index: 10; 
+        }
+        .roulette-disk-img { 
+            width: 100% !important; height: 100% !important; 
+            transition: transform 4.5s cubic-bezier(0.15, 0, 0.15, 1); 
+        }
+        .btn-start { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            width: 70px; height: 70px; background: transparent; border: none; 
+            cursor: pointer; z-index: 20; 
+        }
 
-.roulette-box img { 
-    width: 100%; 
-    height: auto; 
-    display: block; 
-    max-width: 100%; /* 이미지가 박스를 넘지 않도록 제한 */
-}
+        /* 입력폼 섹션 디자인 정밀 복구 */
+        .event-form-sec { 
+            width: 100%; background: #fff; padding: 100px 20px; 
+            border-top: 1px solid #ddd; display: none; 
+        }
+        .form-inner { max-width: 500px; margin: 0 auto; text-align: center; }
+        .prize-res-text { 
+            font-size: 2.2rem; color: var(--hb-gold); font-weight: 800; 
+            margin-bottom: 40px; display: block; letter-spacing: -1px; 
+        }
+        .ev-input, .ev-select { 
+            width: 100%; height: 80px; border: 2px solid #eee; border-radius: 12px; 
+            padding: 0 20px; font-size: 1.5rem; margin-bottom: 15px; 
+            outline: none; transition: 0.3s; background: #fff;
+            box-sizing: border-box; /* 너비 깨짐 방지 */
+        }
+        .ev-input:focus { border-color: var(--hb-gold); }
+        .ev-btn { 
+            width: 100%; height: 90px; background: var(--hb-navy); color: #fff; 
+            border: none; border-radius: 12px; font-size: 1.8rem; 
+            font-weight: 800; cursor: pointer; 
+        }
 
-/* 룰렛 회전부 사이즈 최적화 */
-.disk-wrapper { 
-    position: relative; 
-    width: 320px; 
-    height: 320px; 
-    margin: 0 auto; 
-    flex-shrink: 0; /* 높이 부족 시 찌그러짐 방지 */
-}
-
-.roulette-pointer-img { 
-    position: absolute; 
-    top: -20px; 
-    left: 50%; 
-    transform: translateX(-50%); 
-    width: 50px !important; 
-    z-index: 10; 
-}
-
-.roulette-disk-img { 
-    width: 100% !important; 
-    height: 100% !important; 
-    transition: transform 4.5s cubic-bezier(0.15, 0, 0.15, 1); 
-}
-
-.btn-start { 
-    position: absolute; 
-    top: 50%; 
-    left: 50%; 
-    transform: translate(-50%, -50%); 
-    width: 70px; 
-    height: 70px; 
-    background: transparent; 
-    border: none; 
-    cursor: pointer; 
-    z-index: 20; 
-}
-
-/* 하단 입력폼 섹션 디자인 유지 */
-.event-form-sec { 
-    width: 100%; 
-    background: #fff; 
-    padding: 80px 20px; 
-    border-top: 1px solid #ddd; 
-    display: none; 
-}
-
-@media (max-width: 768px) {
-    .roulette-overlay { padding: 40px 0; }
-    .disk-wrapper { width: 280px; height: 280px; }
-    .roulette-box { gap: 15px; }
-    .roulette-box img[alt="타이틀"] { width: 85%; } /* 모바일에서 타이틀 약간 축소 */
-}
         /* 5. 푸터 */
         footer { padding: 120px 20px 220px; background: #222; color: #bbb; text-align: center; width: 100%; line-height: 2; pointer-events: auto; }
         footer, footer span, footer div { color: #bbb !important; text-decoration: none !important; }
@@ -154,10 +120,13 @@
             .branch-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
             .branch-link { height: 75px; font-size: 1.3rem; border-width: 2px; }
             .cta-btn { height: 60px; font-size: 0.9rem; }
+            .roulette-overlay { padding: 40px 0; }
             .disk-wrapper { width: 280px; height: 280px; }
+            .roulette-box img[alt="타이틀"] { width: 85%; }
+            .event-form-sec { padding: 60px 15px; }
             .prize-res-text { font-size: 1.6rem; }
-            .ev-input, .ev-select { height: 60px; font-size: 1.1rem; }
-            .ev-btn { height: 70px; font-size: 1.3rem; }
+            .ev-input, .ev-select { height: 65px; font-size: 1.1rem; }
+            .ev-btn { height: 75px; font-size: 1.3rem; }
             footer { padding: 60px 20px 140px; }
             .hb-footerLogo { height: 80px; }
             .ft-strong { font-size: 1.1rem; }
@@ -169,17 +138,12 @@
 <!-- [룰렛 오버레이] -->
 <div id="evOverlay" class="roulette-overlay">
     <div class="roulette-box">
-        <!-- 1. 타이틀 이미지 -->
         <img src="/assets/roulette_title.png" alt="타이틀">
         <div class="disk-wrapper">
-            <!-- 2. 포인터 이미지 -->
             <img src="/assets/roulette_pointer.png" class="roulette-pointer-img" alt="포인터">
-            <!-- 3. 디스크 이미지 -->
             <img id="evDisk" src="/assets/roulette_disk.png" class="roulette-disk-img" alt="디스크">
-            <!-- 클릭 버튼 (투명) -->
             <button class="btn-start" onclick="runSpin()"></button>
         </div>
-        <!-- 4. 하단 정보 이미지 -->
         <img src="/assets/roulette_info.png" alt="하단정보">
         <div onclick="document.getElementById('evOverlay').style.display='none'" style="color:#888; text-decoration:underline; cursor:pointer; font-size:14px; margin-top:10px;">나중에 참여하기</div>
     </div>
@@ -213,14 +177,13 @@
     <!-- [이벤트 신청 섹션] -->
     <section id="evFormSec" class="event-form-sec">
         <div class="form-inner">
-            <h3 style="font-size:2rem; color:#0A1D37; margin-bottom:10px;">🎊 당첨을 축하드립니다!</h3>
+            <h3 style="font-size:2rem; color:#0A1D37; margin-bottom:10px; font-weight:800;">🎊 당첨을 축하드립니다!</h3>
             <h3 style="font-size:1rem; color:#1b2129; margin-bottom:10px;">당첨 혜택은 한복 계약 시 사용 가능합니다.</h3>
             <span id="evPrizeText" class="prize-res-text"></span>
             
             <input type="text" id="evName" class="ev-input" placeholder="성함">
             <input type="text" id="evPhone" class="ev-input" placeholder="연락처 (11자리)" maxlength="13">
             
-            <!-- 울산점 단일지점 고정 -->
             <select id="evBranch" class="ev-select">
                 <option value="울산점">상담 희망 지점: 울산점</option>
             </select>
@@ -247,7 +210,6 @@
 </div>
 
 <script>
-    // [이벤트 변수 선언]
     let isEvRunning = false;
     let evResult = "";
 
@@ -271,17 +233,12 @@
             const a = document.createElement('a'); a.className = 'branch-link'; a.href = b.url; a.target = '_blank'; a.innerText = b.name; grid.appendChild(a);
         });
 
-        // 네이버 지도: 울산점
         const map = new naver.maps.Map('naverMap', {
             center: new naver.maps.LatLng(35.5583, 129.3621),
             zoom: 16
         });
-        new naver.maps.Marker({
-            position: new naver.maps.LatLng(35.5583, 129.3621),
-            map: map
-        });
+        new naver.maps.Marker({ position: new naver.maps.LatLng(35.5583, 129.3621), map: map });
 
-        // 연락처 자동 하이픈 로직
         const evPhoneInput = document.getElementById('evPhone');
         if(evPhoneInput) {
             evPhoneInput.addEventListener('input', function(e) {
@@ -294,16 +251,15 @@
         }
     }
 
-    // 룰렛 실행 엔진
     function runSpin() {
         if (isEvRunning) return;
         isEvRunning = true;
         const disk = document.getElementById("evDisk");
         
         const prizes = [
-            { name: "25만원 할인", a: 0, w: 1 }, { name: "10만원 할인", a: 60, w: 35 }, 
-            { name: "20만원 할인", a: 120, w: 4 }, { name: "진주귀걸이 증정", a: 180, w: 20 },  
-            { name: "5만원 할인", a: 240, w: 35 }, { name: "15만원 할인", a: 300, w: 5 }    
+            { name: "25만원", a: 0, w: 1 }, { name: "10만원", a: 60, w: 35 }, 
+            { name: "20만원", a: 120, w: 4 }, { name: "진주귀걸이 증정", a: 180, w: 20 },  
+            { name: "5만원", a: 240, w: 35 }, { name: "15만원", a: 300, w: 5 }    
         ];
         const totalW = prizes.reduce((acc, p) => acc + p.w, 0);
         let rand = Math.random() * totalW;
@@ -327,7 +283,6 @@
         }, 4500);
     }
 
-    // 데이터 제출 (GAS 연동)
     function submitEvData() {
         const name = document.getElementById('evName').value.trim();
         const phone = document.getElementById('evPhone').value.trim();
@@ -337,7 +292,6 @@
         if(!name || phone.replace(/-/g, "").length < 11) return alert("성함과 연락처를 정확히 입력해주세요.");
 
         const finalURL = `${GAS_URL}?name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&prize=${encodeURIComponent(evResult)}&branch=${encodeURIComponent(branch)}`;
-        
         const btn = document.querySelector('.ev-btn');
         btn.innerText = "처리 중..."; btn.disabled = true;
 
@@ -345,7 +299,7 @@
         .then(res => res.json())
         .then(data => {
             if(data.result === "success") {
-                alert("프리미엄 혜택 신청이 완료되었습니다! 담당자가 빠른 시일 내 연락드리겠습니다.");
+                alert("신청이 완료되었습니다! 담당자가 곧 연락드리겠습니다.");
                 btn.innerText = "혜택 신청 완료";
             } else if(data.result === "duplicate") {
                 alert("이미 참여하신 내역이 있습니다.");
@@ -353,7 +307,7 @@
             }
         })
         .catch(() => {
-            alert("신청이 정상적으로 완료되었습니다. (관리자 확인 요망)");
+            alert("신청 완료! 확인 후 연락드리겠습니다.");
             btn.innerText = "신청 완료";
         });
     }
