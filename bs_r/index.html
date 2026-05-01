@@ -247,7 +247,7 @@
         const btnCT = document.getElementById('btnCT');
         document.getElementById('modalTitle').innerText = data.title;
         btnBS.href = data.bs; btnBS.style.background = data.colorBS; btnBS.style.color = data.text || "#fff";
-        btnBS.innerText = "부산점(본점) " + (type === 'call' ? "전화하기" : type === 'kakao' ? "카톡하기" : "예약하기");
+        btnBS.innerText = "부산점 " + (type === 'call' ? "전화하기" : type === 'kakao' ? "카톡하기" : "예약하기");
         btnCT.href = data.ct; btnCT.style.background = data.colorCT; btnCT.style.color = data.text || "#fff";
         btnCT.innerText = "센텀점 " + (type === 'call' ? "전화하기" : type === 'kakao' ? "카톡하기" : "예약하기");
         document.getElementById('selectModal').style.display = 'flex';
@@ -317,8 +317,8 @@ function submitEvData() {
     .then(res => res.json())
     .then(data => {
         if(data.result === "success") {
-            alert("프리미엄 혜택이 성공적으로 활성화되었습니다!");
-            btn.innerText = "활성화 완료";
+            alert("프리미엄 혜택이 성공적으로 신청되었습니다! 담당자가 빠른 시일 내 연락드리겠습니다!");
+            btn.innerText = "혜택 신청 완료";
         } else if(data.result === "duplicate") {
             alert("이미 참여하신 내역이 있습니다.");
             btn.innerText = "참여 완료";
