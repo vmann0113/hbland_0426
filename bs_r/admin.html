@@ -1,224 +1,341 @@
-<!DOCTYPE html>
-<html lang="ko">
+<!doctype html>
+<html lang="ko"> 
 <head>
-    <meta charset="UTF-8">
-    <title>한빔한복 | 이벤트 관리 시스템</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no, address=no, email=no">
+    <title>한빔한복 부산/센텀 통합 예약센터</title>
+    <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=p92c8gq59k"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
     <style>
-        /* 한빔한복 브랜드 아이덴티티 반영 (Navy & Gold) */
-        body { font-family: 'Pretendard', sans-serif; background: #f8f9fa; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: #333; }
-        
-        /* 로그인 섹션 */
-        #login-section { background: #fff; padding: 50px 40px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); width: 100%; max-width: 400px; text-align: center; margin-top: 12vh; border-top: 5px solid #0A1D37; }
-        #login-section h2 { margin-bottom: 30px; font-size: 26px; color: #0A1D37; letter-spacing: -1px; }
-        .input-group { margin-bottom: 20px; text-align: left; }
-        .input-group label { display: block; font-size: 14px; color: #555; margin-bottom: 8px; font-weight: 600; }
-        .input-group input { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 8px; box-sizing: border-box; outline: none; font-size: 16px; transition: 0.3s; }
-        .input-group input:focus { border-color: #0A1D37; background: #fdfdfd; }
-        .btn-login { width: 100%; padding: 16px; background: #0A1D37; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 15px; font-size: 17px; transition: 0.3s; }
-        .btn-login:hover { background: #1a2a44; transform: translateY(-2px); }
-        
-        /* 관리자 메인 섹션 */
-        #admin-section { display: none; width: 95%; max-width: 1200px; padding: 60px 0; margin: 0 auto; }
-        .admin-card { background: #fff; padding: 40px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; border-bottom: 2px solid #f8f8f8; padding-bottom: 30px; }
-        .header h2 { margin: 0; font-size: 24px; color: #0A1D37; }
+        :root { 
+            --hb-navy: #0A1D37; --hb-gold: #B8977E; --hb-bg-gray: #eeeef1; 
+            --hb-line-blue: #1b4b9b; --pc-max-width: 1300px; --naver-green: #03C75A;
+            --kakao-yellow: #FEE500;
+        }
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        body { margin: 0; font-family: 'Pretendard', sans-serif; background-color: var(--hb-bg-gray); display: flex; flex-direction: column; align-items: center; }
 
-        /* 필터 및 검색 */
-        .search-container { margin-bottom: 30px; display: flex; gap: 12px; }
-        .search-input { flex: 1; padding: 15px 25px; border: 1.5px solid #eee; border-radius: 10px; font-size: 16px; outline: none; transition: 0.3s; background: #fcfcfc; }
-        .search-input:focus { border-color: #0A1D37; box-shadow: 0 0 12px rgba(10,29,55,0.05); background: #fff; }
+        .main-wrapper { width: 100%; max-width: var(--pc-max-width); background-color: transparent; }
 
-        /* 버튼 */
-        .btn-excel { background: #B8977E; color: #fff; border: none; padding: 14px 25px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 15px; transition: 0.3s; }
-        .btn-excel:hover { background: #a6856c; }
-        .btn-logout { background: #f4f4f4; color: #666; border: none; padding: 14px 25px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 15px; margin-left: 10px; transition: 0.3s; }
-        .btn-logout:hover { background: #eee; color: #333; }
-        
-        /* 데이터 테이블 */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; }
-        th { background: #fcfcfc; padding: 20px 15px; text-align: center; border-bottom: 2px solid #f0f0f0; font-size: 15px; color: #777; font-weight: 600; }
-        td { padding: 20px 15px; border-bottom: 1px solid #f4f4f4; font-size: 15px; text-align: center; word-break: break-all; }
-        .phone-link { color: #0A1D37; text-decoration: none; font-weight: 700; border-bottom: 1px solid #0A1D37; }
-        .prize-tag { background: #fdf5ef; color: #B8977E; padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 14px; border: 1px solid #f5e8de; }
-        tr:hover { background: #fbfbfb; }
+        /* 1. 이미지 섹션 */
+        .hero-feed img { width: 100%; height: auto; display: block; }
 
-        /* 상태 창 */
-        #loading { text-align: center; padding: 60px; color: #aaa; font-size: 16px; }
-        #no-result { display: none; text-align: center; padding: 60px; color: #999; font-size: 16px; }
+        /* 2. 주소 및 지도 (PC 2배 확대) */
+        .info-sec { padding: 80px 20px; text-align: center; }
+        .info-sec h2 { font-size: 3.5rem; color: var(--hb-navy); margin-bottom: 50px; font-weight: 800; letter-spacing: -2px; }
+        .dual-map-container { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; width: 100%; max-width: 1200px; margin: 0 auto; }
+        .map-card { background: #fff; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .map-card h3 { font-size: 2.2rem; margin-bottom: 20px; color: var(--hb-navy); }
+        .naver-map { width: 100%; height: 400px; border-radius: 12px; }
+        .addr-text { font-size: 1.4rem; color: #555; margin-top: 20px; font-weight: 600; line-height: 1.4; min-height: 3em; }
+
+        /* 3. 타이틀 바 */
+        .reservation-title-bar { width: 100%; background-color: var(--hb-line-blue); padding: 40px 20px; display: flex; align-items: center; justify-content: center; margin-top: 60px; overflow: hidden; }
+        .title-text { color: #ffffff; font-size: 3.2rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 20px; white-space: nowrap; letter-spacing: -1.5px; }
+        .naver-logo-img { height: 52px; width: auto; display: block; }
+
+        /* 4. 지점 버튼 */
+        .branch-grid-sec { padding: 80px 20px 150px; text-align: center; }
+        .branch-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; width: 100%; max-width: 1150px; margin: 0 auto; }
+        .branch-link { display: flex; align-items: center; justify-content: center; background: #fff; border: 3px solid var(--hb-line-blue); color: var(--hb-line-blue); text-decoration: none; height: 120px; border-radius: 15px; font-size: 2.6rem; font-weight: 900; }
+
+        /* 5. 푸터 (하이퍼링크 방지 처리) */
+        footer { padding: 120px 20px 220px; background: #222; color: #bbb; text-align: center; width: 100%; line-height: 2; pointer-events: auto; }
+        footer a { color: inherit; text-decoration: none; pointer-events: none; } /* 푸터 내 자동링크 무력화 */
+        .hb-footerLogo { height: 150px; width: auto; margin-bottom: 40px; filter: brightness(0) invert(1); }
+        .biz-item { border-bottom: 1px solid #444; padding-bottom: 20px; margin-bottom: 20px; }
+        .ft-strong { font-size: 1.4rem; font-weight: 700; color: #fff; display: block; margin-bottom: 5px; }
+
+        /* 6. 고정 CTA */
+        .fixed-cta { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: var(--pc-max-width); background: #fff; display: flex; padding: 15px; gap: 12px; box-shadow: 0 -5px 25px rgba(0,0,0,0.15); z-index: 1000; }
+        .cta-btn { flex: 1; height: 90px; display: flex; align-items: center; justify-content: center; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 1.8rem; border: none; cursor: pointer; }
+        .btn-call { background: var(--hb-navy); color: #fff; }
+        .btn-kakao { background: var(--kakao-yellow); color: #3C1E1E; }
+        .btn-reserve { background: var(--naver-green); color: #fff; }
+        .btn-home { background: var(--hb-gold); color: #fff; }
+
+        /* 팝업 모달 */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
+        .modal-content { background: #fff; width: 100%; max-width: 600px; border-radius: 20px; padding: 50px 40px; text-align: center; }
+        .modal-content h4 { font-size: 2.2rem; margin-bottom: 30px; color: var(--hb-navy); letter-spacing: -1px; }
+        .modal-btns { display: flex; flex-direction: column; gap: 15px; }
+        .modal-btn { height: 90px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 2rem; font-weight: 800; text-decoration: none; color: #fff; }
+        /* 🔥 닫기 버튼 간격 상단으로 50px 확장 */
+        .modal-close { margin-top: 50px; display: inline-block; color: #999; text-decoration: underline; cursor: pointer; font-size: 1.4rem; }
 
         @media (max-width: 768px) {
-            .header { flex-direction: column; gap: 20px; align-items: flex-start; }
-            .search-container { flex-direction: column; }
-            th, td { font-size: 13px; padding: 15px 10px; }
+            .info-sec { padding: 30px 15px; }
+            .info-sec h2 { font-size: 1.8rem; margin-bottom: 30px; }
+            .dual-map-container { grid-template-columns: 1fr; gap: 20px; }
+            .map-card h3 { font-size: 1.5rem; } .naver-map { height: 280px; }
+            .addr-text { font-size: 1rem; min-height: auto; }
+            .reservation-title-bar { padding: 20px 10px; margin-top: 30px; }
+            .title-text { font-size: 4.8vw; gap: 2vw; } .naver-logo-img { height: 5vw; }
+            .branch-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .branch-link { height: 75px; font-size: 1.3rem; border-width: 2px; }
+            .cta-btn { height: 60px; font-size: 0.9rem; }
+            .modal-content { padding: 40px 20px; }
+            .modal-content h4 { font-size: 1.6rem; }
+            .modal-btn { height: 70px; font-size: 1.5rem; }
+            .modal-close { margin-top: 40px; }
+            footer { padding: 60px 20px 140px; }
+            .hb-footerLogo { height: 80px; }
         }
+        /* 룰렛 전용 스타일 */
+.roulette-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 3000; }
+.roulette-container { width: 90%; max-width: 450px; text-align: center; color: #fff; }
+.roulette-title { font-size: 2.2rem; color: var(--hb-gold); margin-bottom: 30px; font-weight: 800; }
+.roulette-wrapper { position: relative; width: 320px; margin: 0 auto 30px; }
+.roulette-pointer { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); z-index: 10; color: var(--hb-gold); font-size: 40px; }
+.roulette-disk { width: 320px; height: 320px; border-radius: 50%; border: 6px solid var(--hb-gold); background: url('/assets/roulette_disk.png') no-repeat center/cover; transition: transform 4.5s cubic-bezier(0.15, 0, 0.15, 1); }
+.roulette-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70px; height: 70px; border-radius: 50%; background: var(--hb-navy); border: 2px solid var(--hb-gold); color: #fff; font-weight: 800; cursor: pointer; z-index: 5; }
+.roulette-info { font-size: 1.1rem; color: #aaa; margin-top: 10px; line-height: 1.5; }
+
+/* 하단 입력폼 스타일 */
+.event-form-sec { width: 100%; background: #fff; padding: 100px 20px; border-top: 1px solid #ddd; display: none; }
+.form-inner { max-width: 500px; margin: 0 auto; text-align: center; }
+.form-inner h3 { font-size: 2.5rem; color: var(--hb-navy); margin-bottom: 10px; }
+.prize-text { font-size: 1.8rem; color: var(--hb-gold); font-weight: 800; margin-bottom: 40px; display: block; }
+.input-box { width: 100%; height: 80px; border: 2px solid #eee; border-radius: 12px; padding: 0 20px; font-size: 1.5rem; margin-bottom: 15px; outline: none; }
+.input-box:focus { border-color: var(--hb-gold); }
+.branch-select { width: 100%; height: 80px; border: 2px solid #eee; border-radius: 12px; padding: 0 20px; font-size: 1.5rem; margin-bottom: 25px; background: #fff; }
+.btn-submit { width: 100%; height: 90px; background: var(--hb-navy); color: #fff; border: none; border-radius: 12px; font-size: 1.8rem; font-weight: 800; cursor: pointer; }
+
+@media (max-width: 768px) {
+    .roulette-disk, .roulette-wrapper { width: 280px; height: 280px; }
+    .roulette-title { font-size: 1.5rem; }
+    .event-form-sec { padding: 60px 20px; }
+    .input-box, .branch-select { height: 60px; font-size: 1.1rem; }
+    .btn-submit { height: 70px; font-size: 1.3rem; }
+}
     </style>
 </head>
 <body>
-
-    <!-- 로그인 섹션 -->
-    <div id="login-section">
-        <h2 style="letter-spacing: 2px;">HANBEAM<br><span style="font-size: 16px; font-weight: 400; color: #B8977E;">ADMIN DASHBOARD</span></h2>
-        <div class="input-group">
-            <label>관리자 ID</label>
-            <input type="text" id="admin-id" placeholder="ID">
+<div id="rouletteOverlay" class="roulette-overlay">
+    <div class="roulette-container">
+        <!-- 1. 타이틀 -->
+        <h2 class="roulette-title">한빔한복 프리미엄 혜택 룰렛</h2>
+        
+        <div class="roulette-wrapper">
+            <!-- 2. 포인터 -->
+            <div class="roulette-pointer">▼</div>
+            <!-- 3. 디스크 -->
+            <div id="rouletteDisk" class="roulette-disk"></div>
+            <button class="roulette-btn" onclick="spinEngine()">START</button>
         </div>
-        <div class="input-group">
-            <label>비밀번호</label>
-            <input type="password" id="admin-pw" placeholder="Password">
-        </div>
-        <button class="btn-login" onclick="handleLogin()">시스템 접속</button>
-    </div>
-
-    <!-- 데이터 대시보드 -->
-    <div id="admin-section">
-        <div class="admin-card">
-            <div class="header">
-                <h2>📊 이벤트 당첨자 실시간 명단</h2>
-                <div>
-                    <button class="btn-excel" onclick="exportToExcel()">엑셀(CSV) 저장</button>
-                    <button class="btn-logout" onclick="handleLogout()">로그아웃</button>
-                </div>
-            </div>
-
-            <div class="search-container">
-                <input type="text" id="search-input" class="search-input" onkeyup="filterLeads()" placeholder="고객명, 연락처, 당첨상품으로 검색하세요...">
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th width="20%">참여 일시</th>
-                        <th width="15%">성함</th>
-                        <th width="20%">연락처</th>
-                        <th width="15%">지점</th>
-                        <th width="30%">🎁 당첨 혜택</th>
-                    </tr>
-                </thead>
-                <tbody id="data-list"></tbody>
-            </table>
-            
-            <div id="loading">구글 시트로부터 데이터를 연동하고 있습니다...</div>
-            <div id="no-result">일치하는 신청 내역이 없습니다.</div>
+        
+        <!-- 4. 하단 정보 -->
+        <div class="roulette-info">
+            본 혜택은 1인 1회 참여 가능하며<br>
+            당첨된 혜택은 하단 폼 등록 시 활성화됩니다.
         </div>
     </div>
+</div>
+<div class="main-wrapper">
+    <section class="hero-feed">
+        <img src="/assets/01.webp"><img src="/assets/02.webp"><img src="/assets/03.webp">
+        <img src="/assets/04.webp"><img src="/assets/05.webp"><img src="/assets/06.webp">
+    </section>
+
+    <section class="info-sec">
+        <h2>한빔한복 부산/센텀점 위치안내</h2>
+        <div class="dual-map-container">
+            <div class="map-card">
+                <h3>부산점</h3>
+                <div id="map_busan" class="naver-map"></div>
+                <p class="addr-text">부산광역시 부산진구 자유평화로 17, 3층 (범천동)</p>
+            </div>
+            <div class="map-card">
+                <h3>센텀점</h3>
+                <div id="map_centum" class="naver-map"></div>
+                <p class="addr-text">부산광역시 해운대구 센텀서로 30, 3층 304호(우동, 벡스코 비지니스호텔)</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="reservation-title-bar">
+        <div class="title-text">
+            전국 지점별 <img src="/assets/naver_logo.png" class="naver-logo-img"> 예약링크
+        </div>
+    </div>
+
+    <section class="branch-grid-sec">
+        <div class="branch-grid" id="branchGrid"></div>
+    </section>
+<section id="eventForm" class="event-form-sec">
+    <div class="form-inner">
+        <h3>🎁 당첨을 축하드립니다!</h3>
+        <span id="prizeDisplay" class="prize-text"></span>
+        
+        <input type="text" id="userName" class="input-box" placeholder="성함">
+        <input type="text" id="userPhone" class="input-box" placeholder="연락처 (11자리)" maxlength="13">
+        
+        <select id="userBranch" class="branch-select">
+            <option value="부산점">상담지점: 부산점(본점)</option>
+            <option value="센텀점">상담지점: 센텀점</option>
+        </select>
+        
+        <button class="btn-submit" onclick="handleLeadSubmit()">프리미엄 혜택 활성화하기</button>
+    </div>
+</section>
+    <footer>
+        <img class="hb-footerLogo" src="/assets/footer_logo.png">
+        <div class="biz-item">
+            <span class="ft-strong">한빔한복 부산점</span>
+            대표자: 김태현 | 등록번호: 637-48-00829 | TEL.051-634-2325
+        </div>
+        <div class="biz-item">
+            <span class="ft-strong">한빔한복 센텀점</span>
+            대표자: 이명진 | 등록번호: 410-10-03229 | TEL.010-3052-2325
+        </div>
+        <div style="color:#666; margin-top:20px;">ⓒ Hanbim Hanbok</div>
+    </footer>
+</div>
+
+<div class="fixed-cta">
+    <button onclick="openModal('call')" class="cta-btn btn-call">전화상담</button>
+    <button onclick="openModal('kakao')" class="cta-btn btn-kakao">카톡문의</button>
+    <button onclick="openModal('reserve')" class="cta-btn btn-reserve">네이버예약</button>
+    <a href="https://hanbeam.co.kr" class="cta-btn btn-home">홈페이지</a>
+</div>
+
+<div id="selectModal" class="modal-overlay" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <h4 id="modalTitle">문의하실 지점을 선택해주세요</h4>
+        <div class="modal-btns">
+            <a href="" id="btnBS" class="modal-btn" style="background: var(--hb-navy);">부산점(본점)</a>
+            <a href="" id="btnCT" class="modal-btn" style="background: var(--hb-line-blue);">센텀점</a>
+        </div>
+        <div class="modal-close" onclick="closeModal()">닫기</div>
+    </div>
+</div>
 
 <script>
-    /* ★ 설정: 이전 코드와 동일하게 GAS_URL만 잘 넣어주시면 됩니다 */
-    const ADMIN_CREDENTIALS = { id: "admin", pw: "1234" }; 
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzFX0_bpw0It_r6uon9km3qzfYjnoCwoZx_y5GsOwyDcJCUSlcxhHCbXs2FwmoNyhvE/exec"; 
+    const BRANCH_LIST = [
+        { name: "부산점", url: "https://m.booking.naver.com/booking/6/bizes/661812" },
+        { name: "센텀점", url: "https://booking.naver.com/booking/6/bizes/1577219" },
+        { name: "울산점", url: "https://booking.naver.com/booking/6/bizes/1534767" },
+        { name: "김해점", url: "https://booking.naver.com/booking/6/bizes/1402679" },
+        { name: "양산점", url: "https://booking.naver.com/booking/13/bizes/868629" },
+        { name: "창원점", url: "https://booking.naver.com/booking/6/bizes/843111" },
+        { name: "마산점", url: "https://booking.naver.com/booking/6/bizes/1526541" },
+        { name: "진주점", url: "https://m.booking.naver.com/booking/6/bizes/1485854" },
+        { name: "인천점", url: "https://m.booking.naver.com/booking/13/bizes/1039475" },
+        { name: "안산점", url: "https://m.booking.naver.com/booking/6/bizes/1500008" },
+        { name: "대구점", url: "https://m.place.naver.com/place/2043617700/ticket" }
+    ];
 
-    let allLeads = []; 
+    const LINKS = {
+        call: { bs: "tel:0516342325", ct: "tel:01030522325", title: "전화상담 지점 선택", colorBS: "#0A1D37", colorCT: "#1b4b9b" },
+        kakao: { bs: "https://open.kakao.com/o/soq7Ns4d", ct: "https://open.kakao.com/o/sIrXajUf", title: "카톡문의 지점 선택", colorBS: "#FEE500", colorCT: "#FEE500", text: "#3C1E1E" },
+        reserve: { bs: "https://m.booking.naver.com/booking/6/bizes/661812", ct: "https://booking.naver.com/booking/6/bizes/1577219", title: "네이버예약 지점 선택", colorBS: "#03C75A", colorCT: "#03C75A" }
+    };
 
-    function handleLogin() {
-        const idInput = document.getElementById('admin-id').value;
-        const pwInput = document.getElementById('admin-pw').value;
-
-        if (idInput === ADMIN_CREDENTIALS.id && pwInput === ADMIN_CREDENTIALS.pw) {
-            sessionStorage.setItem("isLoggedIn_HB", "true");
-            showAdminPage();
-        } else {
-            alert("관리자 정보가 일치하지 않습니다.");
-        }
-    }
-
-    function handleLogout() {
-        sessionStorage.removeItem("isLoggedIn_HB");
-        location.reload();
-    }
-
-    function showAdminPage() {
-        document.getElementById('login-section').style.display = 'none';
-        document.getElementById('admin-section').style.display = 'block';
-        fetchData();
-    }
-
-    /* admin.html 수정 핵심 로직 */
-function fetchData() {
-    const loading = document.getElementById('loading');
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzFX0_bpw0It_r6uon9km3qzfYjnoCwoZx_y5GsOwyDcJCUSlcxhHCbXs2FwmoNyhvE/exec"; 
-
-    // GAS의 doPost를 실행시키기 위해 POST 방식으로 호출합니다.
-    fetch(GAS_URL, { method: 'POST' })
-    .then(res => res.json())
-    .then(data => {
-        loading.style.display = 'none';
-        if (!data || data.length === 0) {
-            allLeads = [];
-        } else {
-            // 데이터 매핑: [0]성함, [1]연락처, [2]당첨상품, [3]지점, [4]날짜
-            allLeads = data.reverse().map(row => ({
-                name: row[0] || "-",
-                phone: row[1] || "-",
-                prize: row[2] || "-",
-                branch: row[3] || "-",
-                time: row[4] || "-"
-            }));
-        }
-        renderTable(allLeads);
-    })
-    .catch(err => {
-        loading.innerText = "데이터 연동 실패. URL과 권한 설정을 확인하세요.";
-        console.error(err);
-    });
-}
-    function renderTable(dataArray) {
-        const tbody = document.getElementById('data-list');
-        const noResult = document.getElementById('no-result');
-        
-        if (dataArray.length === 0) {
-            tbody.innerHTML = "";
-            noResult.style.display = 'block';
-        } else {
-            noResult.style.display = 'none';
-            tbody.innerHTML = dataArray.map(l => `
-                <tr>
-                    <td style="color:#888; font-size:13px;">${l.time}</td>
-                    <td style="font-weight:700; color:#333;">${l.name}</td>
-                    <td><a href="tel:${l.phone}" class="phone-link">${l.phone}</a></td>
-                    <td><span style="font-size:14px; color:#666;">${l.branch}</span></td>
-                    <td><span class="prize-tag">${l.prize}</span></td> 
-                </tr>
-            `).join('');
-        }
-    }
-
-    function filterLeads() {
-        const query = document.getElementById('search-input').value.toLowerCase();
-        const filtered = allLeads.filter(lead => 
-            lead.name.toLowerCase().includes(query) || 
-            lead.phone.includes(query) ||
-            lead.prize.toLowerCase().includes(query) ||
-            lead.branch.toLowerCase().includes(query)
-        );
-        renderTable(filtered);
-    }
-
-    function exportToExcel() {
-        if(allLeads.length === 0) return alert("다운로드할 데이터가 없습니다.");
-
-        let csv = "\uFEFF참여시간,이름,연락처,지점,당첨상품\n";
-        allLeads.forEach(l => { 
-            csv += `${l.time},${l.name},${l.phone},${l.branch},${l.prize}\n`; 
+    function init() {
+        const grid = document.getElementById('branchGrid');
+        BRANCH_LIST.forEach(b => {
+            const a = document.createElement('a'); a.className = 'branch-link'; a.href = b.url; a.target = '_blank'; a.innerText = b.name; grid.appendChild(a);
         });
 
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.setAttribute("download", "한빔한복_이벤트_당첨자_명단.csv");
-        link.click();
+        const mapBS = new naver.maps.Map('map_busan', { center: new naver.maps.LatLng(35.1432, 129.0645), zoom: 16 });
+        new naver.maps.Marker({ position: new naver.maps.LatLng(35.1432, 129.0645), map: mapBS });
+
+        const mapCT = new naver.maps.Map('map_centum', { center: new naver.maps.LatLng(35.1748, 129.1271), zoom: 16 });
+        new naver.maps.Marker({ position: new naver.maps.LatLng(35.1748, 129.1271), map: mapCT });
+    }
+let isSpinning = false;
+let prizeResult = "";
+
+// 연락처 자동 하이픈 및 11자리 제한
+document.getElementById('userPhone').addEventListener('input', function(e) {
+    let val = e.target.value.replace(/[^0-9]/g, ""); 
+    if (val.length > 11) val = val.substring(0, 11); 
+    if (val.length < 4) { e.target.value = val; } 
+    else if (val.length < 8) { e.target.value = val.substr(0, 3) + "-" + val.substr(3); } 
+    else { e.target.value = val.substr(0, 3) + "-" + val.substr(3, 4) + "-" + val.substr(7); }
+});
+
+function spinEngine() {
+    if (isSpinning) return;
+    const disk = document.getElementById("rouletteDisk");
+    isSpinning = true;
+    
+    const prizes = [
+        { name: "25만원 할인", a: 0, w: 1 }, { name: "10만원 할인", a: 60, w: 35 }, 
+        { name: "20만원 할인", a: 120, w: 4 }, { name: "진주귀걸이 증정", a: 180, w: 20 },  
+        { name: "5만원 할인", a: 240, w: 35 }, { name: "15만원 할인", a: 300, w: 5 }    
+    ];
+
+    const totalWeight = prizes.reduce((acc, p) => acc + p.w, 0);
+    let randomNum = Math.random() * totalWeight;
+    let selectedPrize = prizes[0];
+
+    for (let i = 0; i < prizes.length; i++) {
+        if (randomNum < prizes[i].w) { selectedPrize = prizes[i]; break; }
+        randomNum -= prizes[i].w;
     }
 
-    document.getElementById('admin-pw').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') handleLogin();
-    });
+    const rotate = 3600 + (360 - selectedPrize.a);
+    disk.style.transform = `rotate(${rotate}deg)`;
 
-    window.onload = function() {
-        if (sessionStorage.getItem("isLoggedIn_HB") === "true") {
-            showAdminPage();
+    setTimeout(() => {
+        prizeResult = selectedPrize.name;
+        alert(`🎊 축하합니다! [${prizeResult}]에 당첨되셨습니다!`);
+        document.getElementById('rouletteOverlay').style.display = 'none';
+        document.getElementById('eventForm').style.display = 'block';
+        document.getElementById('prizeDisplay').innerText = "당첨 상품: " + prizeResult;
+        
+        // 입력폼으로 부드럽게 이동
+        document.getElementById('eventForm').scrollIntoView({ behavior: 'smooth' });
+        isSpinning = false;
+    }, 4500);
+}
+
+function handleLeadSubmit() {
+    const name = document.getElementById('userName').value.trim();
+    const phone = document.getElementById('userPhone').value.trim();
+    const branch = document.getElementById('userBranch').value;
+    // ★ 대표님의 구글 앱스 스크립트 웹 앱 URL을 여기에 넣으세요
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxJwTVpsdJ64hihl9yV9yM5NpNVVL1_AN57_5UsGl8VIiP1RyORXmKOooDc609LO2E5/exec"; 
+
+    if(!name || phone.replace(/-/g, "").length < 11) return alert("성함과 연락처 11자리를 정확히 입력해주세요.");
+
+    const finalURL = `${GAS_URL}?name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&prize=${encodeURIComponent(prizeResult)}&branch=${encodeURIComponent(branch)}`;
+    
+    const btn = document.querySelector('.btn-submit');
+    btn.innerText = "처리 중..."; btn.disabled = true;
+
+    fetch(finalURL)
+    .then(res => res.json())
+    .then(data => {
+        if(data.result === "success") {
+            alert("프리미엄 혜택이 정상적으로 활성화되었습니다!");
+            btn.innerText = "활성화 완료";
+        } else if(data.result === "duplicate") {
+            alert("이미 참여하신 연락처입니다.");
+            btn.innerText = "이미 신청됨";
         }
-    };
-</script>
+    })
+    .catch(() => {
+        alert("신청 완료! 확인 후 연락드리겠습니다.");
+        btn.innerText = "신청 완료";
+    });
+}
+    function openModal(type) {
+        const data = LINKS[type];
+        const btnBS = document.getElementById('btnBS');
+        const btnCT = document.getElementById('btnCT');
+        document.getElementById('modalTitle').innerText = data.title;
+        btnBS.href = data.bs; btnBS.style.background = data.colorBS; btnBS.style.color = data.text || "#fff";
+        btnBS.innerText = "부산점(본점) " + (type === 'call' ? "전화하기" : type === 'kakao' ? "카톡하기" : "예약하기");
+        btnCT.href = data.ct; btnCT.style.background = data.colorCT; btnCT.style.color = data.text || "#fff";
+        btnCT.innerText = "센텀점 " + (type === 'call' ? "전화하기" : type === 'kakao' ? "카톡하기" : "예약하기");
+        document.getElementById('selectModal').style.display = 'flex';
+    }
 
+    function closeModal() { document.getElementById('selectModal').style.display = 'none'; }
+    window.onload = init;
+</script>
 </body>
 </html>
