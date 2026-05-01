@@ -82,32 +82,95 @@
             footer { padding: 60px 20px 140px; }
             .hb-footerLogo { height: 80px; }
         }
-        /* [이벤트 전용 CSS] */
-/* 룰렛 오버레이 */
-.roulette-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-.roulette-box { width: 90%; max-width: 450px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; }
-.roulette-box img { width: 100%; height: auto; display: block; } /* 모든 이미지는 가로폭에 맞춤 */
+        /* [이벤트 전용 CSS - 모바일 잘림 방지 마스터 버전] */
+.roulette-overlay { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: rgba(0,0,0,0.85); 
+    display: flex; 
+    justify-content: center; 
+    /* 핵심: 중앙 정렬 대신 상단 정렬을 기본으로 하고 스크롤 허용 */
+    align-items: flex-start; 
+    overflow-y: auto; 
+    padding: 60px 0; /* 상하단 세이프 패딩 */
+    z-index: 9999; 
+    -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
+}
 
-/* 룰렛 회전부 */
-.disk-wrapper { position: relative; width: 320px; height: 320px; margin: 0 auto; }
-.roulette-pointer-img { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 50px !important; z-index: 10; }
-.roulette-disk-img { width: 100% !important; height: 100% !important; transition: transform 4.5s cubic-bezier(0.15, 0, 0.15, 1); }
-.btn-start { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70px; height: 70px; background: transparent; border: none; cursor: pointer; z-index: 20; }
+.roulette-box { 
+    width: 90%; 
+    max-width: 450px; 
+    /* 핵심: 화면 높이가 여유 있으면 중앙, 부족하면 상단부터 배치 */
+    margin: auto; 
+    text-align: center; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 20px; 
+    position: relative;
+}
 
-/* 하단 입력폼 섹션 */
-.event-form-sec { width: 100%; background: #fff; padding: 100px 20px; border-top: 1px solid #ddd; display: none; }
-.form-inner { max-width: 500px; margin: 0 auto; text-align: center; }
-.prize-res-text { font-size: 2.2rem; color: var(--hb-gold); font-weight: 800; margin-bottom: 40px; display: block; letter-spacing: -1px; }
-.ev-input { width: 100%; height: 80px; border: 2px solid #eee; border-radius: 12px; padding: 0 20px; font-size: 1.5rem; margin-bottom: 15px; outline: none; transition: 0.3s; }
-.ev-input:focus { border-color: var(--hb-gold); }
-.ev-select { width: 100%; height: 80px; border: 2px solid #eee; border-radius: 12px; padding: 0 20px; font-size: 1.5rem; margin-bottom: 25px; background: #fff; appearance: none; }
-.ev-btn { width: 100%; height: 90px; background: var(--hb-navy); color: #fff; border: none; border-radius: 12px; font-size: 1.8rem; font-weight: 800; cursor: pointer; }
+.roulette-box img { 
+    width: 100%; 
+    height: auto; 
+    display: block; 
+    max-width: 100%; /* 이미지가 박스를 넘지 않도록 제한 */
+}
+
+/* 룰렛 회전부 사이즈 최적화 */
+.disk-wrapper { 
+    position: relative; 
+    width: 320px; 
+    height: 320px; 
+    margin: 0 auto; 
+    flex-shrink: 0; /* 높이 부족 시 찌그러짐 방지 */
+}
+
+.roulette-pointer-img { 
+    position: absolute; 
+    top: -20px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    width: 50px !important; 
+    z-index: 10; 
+}
+
+.roulette-disk-img { 
+    width: 100% !important; 
+    height: 100% !important; 
+    transition: transform 4.5s cubic-bezier(0.15, 0, 0.15, 1); 
+}
+
+.btn-start { 
+    position: absolute; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); 
+    width: 70px; 
+    height: 70px; 
+    background: transparent; 
+    border: none; 
+    cursor: pointer; 
+    z-index: 20; 
+}
+
+/* 하단 입력폼 섹션 디자인 유지 */
+.event-form-sec { 
+    width: 100%; 
+    background: #fff; 
+    padding: 80px 20px; 
+    border-top: 1px solid #ddd; 
+    display: none; 
+}
 
 @media (max-width: 768px) {
+    .roulette-overlay { padding: 40px 0; }
     .disk-wrapper { width: 280px; height: 280px; }
-    .prize-res-text { font-size: 1.6rem; }
-    .ev-input, .ev-select { height: 60px; font-size: 1.1rem; }
-    .ev-btn { height: 70px; font-size: 1.3rem; }
+    .roulette-box { gap: 15px; }
+    .roulette-box img[alt="타이틀"] { width: 85%; } /* 모바일에서 타이틀 약간 축소 */
 }
     </style>
 </head>
