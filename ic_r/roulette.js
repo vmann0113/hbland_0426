@@ -21,10 +21,10 @@ function spinEngine() {
     
     const prizes = [
         { name: "25만원 할인", a: 0, w: 1 }, { name: "10만원 할인", a: 60, w: 35 }, 
-        { name: "20만원 할인", a: 120, w: 4 }, { name: "진주귀걸이 증정", a: 180, w: 20 },  
-        { name: "5만원 할인", a: 240, w: 35 }, { name: "15만원 할인", a: 300, w: 5 }    
+        { name: "20만원 할인", a: 120, w: 1 }, { name: "진주귀걸이 증정", a: 180, w: 20 },  
+        { name: "5만원 할인", a: 240, w: 42 }, { name: "15만원 할인", a: 300, w: 1 }    
     ];
-
+    
     const totalWeight = prizes.reduce((acc, p) => acc + p.w, 0);
     let randomNum = Math.random() * totalWeight;
     let selectedPrize = prizes[0];
