@@ -4,10 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="format-detection" content="telephone=no, address=no, email=no">
-    <title>한빔한복 인천점 공식 예약센터</title>
+    <title>한빔한복 안산점 공식 예약센터</title>
     <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=p92c8gq59k"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
     <style>
+        /* [1. 전역 변수 및 기본 설정] */
         :root { 
             --hb-navy: #0A1D37; --hb-gold: #B8977E; --hb-bg-gray: #eeeef1; 
             --hb-line-blue: #1b4b9b; --pc-max-width: 1300px; --naver-green: #03C75A;
@@ -18,10 +19,8 @@
 
         .main-wrapper { width: 100%; max-width: var(--pc-max-width); background-color: transparent; }
 
-        /* 1. 이미지 섹션 */
+        /* [2. 이미지 및 레이아웃] */
         .hero-feed img { width: 100%; height: auto; display: block; }
-
-        /* 2. 주소 및 지도 */
         .info-sec { padding: 80px 20px; text-align: center; }
         .info-sec h2 { font-size: 3.5rem; color: var(--hb-navy); margin-bottom: 50px; font-weight: 800; letter-spacing: -2px; }
         .map-card { background: #fff; padding: 25px; border-radius: 20px; max-width: 1100px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
@@ -29,26 +28,24 @@
         #naverMap { width: 100%; height: 500px; border-radius: 12px; }
         .addr-text { font-size: 1.6rem; color: #555; margin-top: 25px; font-weight: 600; line-height: 1.4; }
 
-        /* 3. 타이틀 바 */
         .reservation-title-bar { width: 100%; background-color: var(--hb-line-blue); padding: 40px 20px; display: flex; align-items: center; justify-content: center; margin-top: 60px; overflow: hidden; }
         .title-text { color: #ffffff; font-size: 3.2rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 20px; white-space: nowrap; letter-spacing: -1.5px; }
         .naver-logo-img { height: 52px; width: auto; display: block; }
 
-        /* 4. 지점 버튼 그리드 */
         .branch-grid-sec { padding: 80px 20px 100px; text-align: center; }
         .branch-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; width: 100%; max-width: 1150px; margin: 0 auto; }
         .branch-link { display: flex; align-items: center; justify-content: center; background: #fff; border: 3px solid var(--hb-line-blue); color: var(--hb-line-blue); text-decoration: none; height: 120px; border-radius: 15px; font-size: 2.6rem; font-weight: 900; }
 
-        /* [이벤트 전용 CSS - 상단 잘림 방지 및 디자인 복구] */
+        /* [3. 룰렛 이벤트 CSS - 전문가 최적화 버전] */
         .roulette-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.85); display: flex; justify-content: center; 
-            align-items: flex-start; /* 상단 잘림 방지 핵심 */
+            align-items: flex-start; /* 상단 잘림 방지 */
             overflow-y: auto; padding: 60px 0; z-index: 9999; 
             -webkit-overflow-scrolling: touch; 
         }
         .roulette-box { 
-            width: 90%; max-width: 450px; margin: auto; /* 화면 높이에 따른 유동 정렬 */
+            width: 90%; max-width: 450px; margin: auto; 
             text-align: center; display: flex; flex-direction: column; 
             align-items: center; gap: 20px; position: relative;
         }
@@ -86,7 +83,7 @@
             width: 100%; height: 80px; border: 2px solid #eee; border-radius: 12px; 
             padding: 0 20px; font-size: 1.5rem; margin-bottom: 15px; 
             outline: none; transition: 0.3s; background: #fff;
-            box-sizing: border-box; /* 너비 깨짐 방지 핵심 */
+            box-sizing: border-box; /* 디자인 깨짐 방지 핵심 */
         }
         .ev-input:focus { border-color: var(--hb-gold); border-width: 2.5px; }
         .ev-btn { 
@@ -94,16 +91,14 @@
             border: none; border-radius: 12px; font-size: 1.8rem; 
             font-weight: 800; cursor: pointer; transition: 0.3s;
         }
-        .ev-btn:hover { background: #1a2a44; transform: translateY(-2px); }
 
-        /* 5. 푸터 */
+        /* [4. 푸터 및 CTA] */
         footer { padding: 120px 20px 220px; background: #222; color: #bbb; text-align: center; width: 100%; line-height: 2; pointer-events: auto; }
         footer, footer span, footer div { color: #bbb !important; text-decoration: none !important; }
         .hb-footerLogo { height: 150px; width: auto; margin-bottom: 40px; filter: brightness(0) invert(1); }
         .biz-item { border-bottom: 1px solid #444; padding-bottom: 20px; margin-bottom: 20px; color: #bbb; }
         .ft-strong { font-size: 1.4rem; font-weight: 700; color: #fff !important; display: block; margin-bottom: 5px; }
 
-        /* 6. 고정 CTA */
         .fixed-cta { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: var(--pc-max-width); background: #fff; display: flex; padding: 15px; gap: 12px; box-shadow: 0 -5px 25px rgba(0,0,0,0.15); z-index: 1000; }
         .cta-btn { flex: 1; height: 90px; display: flex; align-items: center; justify-content: center; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 1.8rem; border: none; cursor: pointer; }
         .btn-call { background: var(--hb-navy); color: #fff; }
@@ -130,13 +125,12 @@
             .ev-btn { height: 75px; font-size: 1.3rem; }
             footer { padding: 60px 20px 140px; }
             .hb-footerLogo { height: 80px; }
-            .ft-strong { font-size: 1.1rem; }
         }
     </style>
 </head>
 <body>
 
-<!-- [룰렛 오버레이] -->
+<!-- [A] 룰렛 오버레이 -->
 <div id="evOverlay" class="roulette-overlay">
     <div class="roulette-box">
         <img src="/assets/roulette_title.png" alt="타이틀">
@@ -157,11 +151,11 @@
     </section>
 
     <section class="info-sec">
-        <h2>한빔한복 인천점 위치안내</h2>
+        <h2>한빔한복 안산점 위치안내</h2>
         <div class="map-card">
-            <h3>인천점 (삼산동 이리옴프라자)</h3>
+            <h3>안산점</h3>
             <div id="naverMap"></div>
-            <p class="addr-text">인천광역시 부평구 체육관로 34, 4층 402호</p>
+            <p class="addr-text">안산시 단원구 고잔동이삭5길13 2층</p>
         </div>
     </section>
 
@@ -175,11 +169,11 @@
         <div class="branch-grid" id="branchGrid"></div>
     </section>
 
-    <!-- [이벤트 신청 섹션: 푸터 직전] -->
+    <!-- [B] 입력폼 섹션 -->
     <section id="evFormSec" class="event-form-sec">
         <div class="form-inner">
             <h3 style="font-size:2rem; color:#0A1D37; margin-bottom:10px; font-weight:800;">🎊 당첨을 축하드립니다!</h3>
-            <h3 style="font-size:1rem; color:#1b2129; margin-bottom:10px;">당첨금/사은품은 한복 계약 시 사용 가능합니다.</h3>
+            <h3 style="font-size:1rem; color:#1b2129; margin-bottom:10px;">당첨 혜택은 한복 계약 시 사용 가능합니다.</h3>
             <h3 style="font-size:1rem; color:#1b2129; margin-bottom:10px;">사용기한: 2026년 6월 31일까지</h3>
             <span id="evPrizeText" class="prize-res-text"></span>
             
@@ -187,27 +181,27 @@
             <input type="text" id="evPhone" class="ev-input" placeholder="연락처 (11자리)" maxlength="13">
             
             <select id="evBranch" class="ev-select">
-                <option value="인천점">당첨지급지점: 인천점</option>
+                <option value="안산점">당첨지급지점: 안산점</option>
             </select>
             
-            <button class="ev-btn" onclick="submitEvData()">혜택 받기</button>
+            <button class="ev-btn" onclick="submitEvData()">프리미엄 혜택 신청 완료하기</button>
         </div>
     </section>
 
     <footer>
         <img class="hb-footerLogo" src="/assets/footer_logo.png">
         <div class="biz-item">
-            <span class="ft-strong">한빔한복 인천점</span>
-            대표자: 손현희 | 등록번호: 518-05-02862 | TEL.032-283-2325
+            <span class="ft-strong">한빔한복 안산점</span>
+            대표자: 진서효 | 등록번호: 685-25-02234 | TEL.010-6591-2322
         </div>
         <div style="color:#666; margin-top:20px;">ⓒ Hanbim Hanbok</div>
     </footer>
 </div>
 
 <div class="fixed-cta">
-    <a href="tel:0322832325" class="cta-btn btn-call">전화상담</a>
-    <a href="https://open.kakao.com/o/sIrXajUf" class="cta-btn btn-kakao">카톡문의</a>
-    <a href="https://m.booking.naver.com/booking/13/bizes/1039475" class="cta-btn btn-reserve">네이버예약</a>
+    <a href="tel:01065912322" class="cta-btn btn-call">전화상담</a>
+    <a href="https://open.kakao.com/o/sqRSjaRh" class="cta-btn btn-kakao">카톡문의</a>
+    <a href="https://m.booking.naver.com/booking/6/bizes/1500008" class="cta-btn btn-reserve">네이버예약</a>
     <a href="https://hanbeam.co.kr" class="cta-btn btn-home">홈페이지</a>
 </div>
 
@@ -231,18 +225,20 @@
 
     function init() {
         const grid = document.getElementById('branchGrid');
-        if(grid){
+        if(grid) {
             BRANCH_LIST.forEach(b => {
                 const a = document.createElement('a'); a.className = 'branch-link'; a.href = b.url; a.target = '_blank'; a.innerText = b.name; grid.appendChild(a);
             });
         }
 
+        // 네이버 지도: 안산점 교정 (안산 단원구 고잔동)
         const map = new naver.maps.Map('naverMap', {
-            center: new naver.maps.LatLng(37.5074, 126.7371),
+            center: new naver.maps.LatLng(37.3101, 126.8306),
             zoom: 16
         });
-        new naver.maps.Marker({ position: new naver.maps.LatLng(37.5074, 126.7371), map: map });
+        new naver.maps.Marker({ position: new naver.maps.LatLng(37.3101, 126.8306), map: map });
 
+        // 연락처 자동 하이픈 로직
         const evPhoneInput = document.getElementById('evPhone');
         if(evPhoneInput) {
             evPhoneInput.addEventListener('input', function(e) {
@@ -261,9 +257,9 @@
         const disk = document.getElementById("evDisk");
         
         const prizes = [
-            { name: "25만원", a: 0, w: 1 }, { name: "10만원", a: 60, w: 35 }, 
-            { name: "20만원", a: 120, w: 4 }, { name: "진주귀걸이 증정", a: 180, w: 20 },  
-            { name: "5만원", a: 240, w: 35 }, { name: "15만원", a: 300, w: 5 }    
+            { name: "25만원 할인", a: 0, w: 1 }, { name: "10만원 할인", a: 60, w: 35 }, 
+            { name: "20만원 할인", a: 120, w: 1 }, { name: "진주귀걸이 증정", a: 180, w: 20 },  
+            { name: "5만원 할인", a: 240, w: 42 }, { name: "15만원 할인", a: 300, w: 1 }    
         ];
         const totalW = prizes.reduce((acc, p) => acc + p.w, 0);
         let rand = Math.random() * totalW;
