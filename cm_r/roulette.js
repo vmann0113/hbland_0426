@@ -9,31 +9,49 @@ if (phoneInput) {
         if (val.length > 11) val = val.substring(0, 11); 
         if (val.length < 4) { e.target.value = val; } 
         else if (val.length < 8) { e.target.value = val.substr(0, 3) + "-" + val.substr(3); } 
-        else { e.target.value = val.substr(0, 3) + "-" + val.substr(3, 4) + "-" + val.substr(7); }
+        else { e.target.value = val.substr(0, 3) + "-" + val.substr(3, 4) + "-" + v.substr(7); }
     });
 }
 
-// 룰렛 실행 로직
+// 룰렛 실행 로직 (확률 0% 원천 차단 버전)
 function spinEngine() {
     if (isSpinning) return;
-    isSpinning = true;
     const disk = document.getElementById("roulette-disk");
+    if (!disk) return;
+
+    isSpinning = true;
     
+    // 1. 확률 설정 (w: 0으로 설정하면 하늘이 두 쪽 나도 당첨 안 됩니다)
     const prizes = [
-        { name: "25만원", a: 0, w: 0 }, { name: "10만원", a: 60, w: 37 }, 
-        { name: "20만원", a: 120, w: 0 }, { name: "진주귀걸이 증정", a: 180, w: 20 },  
-        { name: "5만원", a: 240, w: 42 }, { name: "15만원", a: 300, w: 1 }    
+        { name: "25만원", a: 0, w: 0 },    // 0으로 설정 시 절대 당첨 불가
+        { name: "10만원", a: 60, w: 36 }, 
+        { name: "20만원", a: 120, w: 0 }, 
+        { name: "진주귀걸이 증정", a: 180, w: 20 },  
+        { name: "5만원", a: 240, w: 43 }, 
+        { name: "15만원", a: 300, w: 1 }    
     ];
 
+    // 2. 가중치 총합 계산
     const totalWeight = prizes.reduce((acc, p) => acc + p.w, 0);
     let randomNum = Math.random() * totalWeight;
-    let selectedPrize = prizes[0];
+    
+    // 3. 당첨자 선별 (초기값을 비워두어 확률 0% 항목의 당첨 가능성을 제거)
+    let selectedPrize = null;
 
     for (let i = 0; i < prizes.length; i++) {
-        if (randomNum < prizes[i].w) { selectedPrize = prizes[i]; break; }
+        if (randomNum < prizes[i].w) {
+            selectedPrize = prizes[i];
+            break;
+        }
         randomNum -= prizes[i].w;
     }
 
+    // 예외 처리 (만약의 상황에도 확률이 있는 항목 중 하나를 강제 선택)
+    if (!selectedPrize) {
+        selectedPrize = prizes.find(p => p.w > 0);
+    }
+
+    // 4. 애니메이션 실행
     const rotate = 3600 + (360 - selectedPrize.a);
     disk.style.transform = `rotate(${rotate}deg)`;
 
@@ -46,15 +64,17 @@ function spinEngine() {
         document.getElementById('prize-result-box').style.display = 'block';
         document.getElementById('won-prize-display').innerText = "당첨 결과: " + prizeResult;
         
-        // [수정] 지도 섹션 아래에 있는 입력폼으로 자동 스크롤
-        document.getElementById('event-input-section').scrollIntoView({ behavior: 'smooth' });
+        // 지도 섹션 아래에 있는 입력폼으로 자동 스크롤
+        const inputSec = document.getElementById('event-input-section');
+        if(inputSec) inputSec.scrollIntoView({ behavior: 'smooth' });
         
         isSpinning = false;
     }, 4500);
 }
 
 function closeOverlay() {
-    document.getElementById('roulette-overlay').style.display = 'none';
+    const overlay = document.getElementById('roulette-overlay');
+    if(overlay) overlay.style.display = 'none';
 }
 
 // 구글 시트 연동 전송 로직
@@ -62,7 +82,6 @@ function handleLeadSubmit() {
     const name = document.getElementById('user-name').value.trim();
     const phone = document.getElementById('user-phone').value.trim();
     const branch = document.getElementById('branch-select').value;
-    // 배포한 GAS URL을 넣으세요
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxJwTVpsdJ64hihl9yV9yM5NpNVVL1_AN57_5UsGl8VIiP1RyORXmKOooDc609LO2E5/exec";
 
     if(!name || phone.replace(/-/g, "").length < 11) return alert("성함과 연락처 11자리를 정확히 입력해주세요.");
