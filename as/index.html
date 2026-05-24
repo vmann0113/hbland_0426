@@ -135,13 +135,13 @@
             const a = document.createElement('a'); a.className = 'branch-link'; a.href = b.url; a.target = '_blank'; a.innerText = b.name; grid.appendChild(a);
         });
 
-        // 네이버 지도: 김해점 (내외중앙로 137 휴앤락몰)
+        // 네이버 지도: 안산점
         const map = new naver.maps.Map('naverMap', {
-            center: new naver.maps.LatLng(35.2343, 128.8722),
+            center: new naver.maps.LatLng(37.3101, 126.8306),
             zoom: 16
         });
         new naver.maps.Marker({
-            position: new naver.maps.LatLng(35.2343, 128.8722),
+            position: new naver.maps.LatLng(37.3101, 126.8306),
             map: map
         });
     }
