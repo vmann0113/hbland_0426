@@ -152,7 +152,7 @@
 
 <div class="main-wrapper">
     <section class="hero-feed">
-        <img src="/assets/01.webp"><img src="/assets/02.webp"><img src="/assets/03.webp">
+        <img src="/assets/01_ic.webp"><img src="/assets/02.webp"><img src="/assets/03.webp">
         <img src="/assets/04.webp"><img src="/assets/05.webp"><img src="/assets/06.webp">
     </section>
 
@@ -261,9 +261,9 @@
         const disk = document.getElementById("evDisk");
         
         const prizes = [
-            { name: "25만원", a: 0, w: 1 }, { name: "10만원", a: 60, w: 35 }, 
-            { name: "20만원", a: 120, w: 4 }, { name: "진주귀걸이 증정", a: 180, w: 20 },  
-            { name: "5만원", a: 240, w: 35 }, { name: "15만원", a: 300, w: 5 }    
+            { name: "25만원", a: 0, w: 0 }, { name: "10만원", a: 60, w: 35 }, 
+            { name: "20만원", a: 120, w: 0 }, { name: "진주귀걸이 증정", a: 180, w: 20 },  
+            { name: "5만원", a: 240, w: 40 }, { name: "15만원", a: 300, w: 5 }    
         ];
         const totalW = prizes.reduce((acc, p) => acc + p.w, 0);
         let rand = Math.random() * totalW;
