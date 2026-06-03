@@ -1,0 +1,165 @@
+/* 
+ * 한빔한복 프리미엄 이벤트 - 최종 UI/UX 엔진
+ * PC/모바일 독립적 위치 및 사이즈 제어 버전
+ */
+
+:root { 
+    --navy: #0A1D37; 
+    --gold: #B8977E; 
+    --naver: #03C75A; 
+    --kakao: #FEE500; 
+    --max-width: 1300px; /* 랜딩페이지 컨텐츠 최대 폭 */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; font-family: 'Pretendard', -apple-system, sans-serif; background-color: #fff; color: #333; }
+
+.master-wrapper { width: 100%; display: flex; flex-direction: column; align-items: center; }
+
+/* ============================================================
+   [1. 룰렛 섹션 - 기기별 배경 및 위치 제어]
+   ============================================================ */
+
+/* [PC 기본 설정] */
+#roulette-section { 
+    width: 100%; 
+    height: 100vh; 
+    background-color: #000;
+    background-image: url('../assets/bg_main.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain; /* PC에서 이미지 거대화 방지 */
+    position: relative; 
+    overflow: hidden;
+}
+
+/* [PC용 룰렛 사이즈 및 위치] */
+.roulette-content {
+    position: absolute; 
+    left: 50%;
+    transform: translateX(-50%); 
+    z-index: 10;
+
+    /* 🔴 [PC 조정 포인트] */
+    bottom: 34%;       /* 바닥에서의 높이 */
+    width: 345px;      /* 룰렛 디스크 가로 크기 */
+}
+
+.wheel-box .pointer { 
+    position: absolute; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    z-index: 20; 
+
+    /* 🔴 [PC 조정 포인트] */
+    top: -7%;         /* 포인터가 원판을 찌르는 깊이 */
+    width: 40px;       /* 포인터 실제 크기 */
+    filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+}
+
+/* [모바일 전용 설정 - 768px 이하] */
+@media (max-width: 768px) {
+    #roulette-section { 
+        background-size: cover; /* 모바일은 화면 꽉 차게 */
+    }
+
+    /* 🔴 [모바일 조정 포인트] */
+    .roulette-content {
+        bottom: 34%;   /* 모바일 바닥에서의 높이 */
+        width: 85%;    /* 모바일 화면 대비 룰렛 크기 (%) */
+        max-width: none;
+    }
+
+    .wheel-box .pointer {
+        top: -4%;     /* 모바일 포인터 찌르는 깊이 */
+        width: 30px;   /* 모바일 포인터 크기 */
+    }
+}
+
+/* 룰렛 디스크 공통 애니메이션 */
+#roulette-disk { 
+    width: 100%; 
+    height: auto; 
+    cursor: pointer; 
+    transition: transform 4.5s cubic-bezier(0.15, 0, 0.2, 1); 
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
+    will-change: transform;
+}
+
+/* ============================================================
+   [2. 랜딩 컨텐츠 및 입력폼 디자인]
+   ============================================================ */
+
+#result-content { width: 100%; }
+.content-container { 
+    width: 100%; 
+    max-width: var(--max-width); 
+    margin: 0 auto; 
+    background: #fff; 
+}
+
+.landing-feed img { width: 100%; height: auto; display: block; }
+
+.form-area { padding: 80px 20px 180px; text-align: center; background: #fff; }
+.form-card { 
+    max-width: 650px; 
+    margin: 0 auto; 
+    background: #fdfaf7; 
+    padding: 50px 40px; 
+    border-radius: 30px; 
+    border: 1px solid #eee;
+}
+
+/* 당첨 혜택 텍스트 - 줄바꿈 방지 및 폰트 최적화 */
+#won-prize-display { 
+    font-size: 2.5rem; 
+    color: var(--navy); 
+    font-weight: 900; 
+    margin-bottom: 12px;
+    letter-spacing: -1.5px;
+    line-height: 1.2;
+    word-break: keep-all;
+}
+
+@media (max-width: 768px) {
+    #won-prize-display { font-size: 1.8rem; } /* 모바일에서 텍스트 축소 */
+    .form-card { padding: 40px 20px; }
+}
+
+.form-guide { color: #888; font-size: 1.1rem; margin-bottom: 40px; }
+
+.input-wrap input, .input-wrap select { 
+    width: 100%; height: 75px; margin-bottom: 15px; padding: 0 25px; 
+    border: 1.5px solid #e1e1e1; border-radius: 15px; font-size: 1.2rem;
+}
+
+.btn-submit { 
+    width: 100%; height: 85px; background: var(--navy); color: #fff; 
+    border: none; border-radius: 15px; font-size: 1.5rem; font-weight: 800; cursor: pointer;
+}
+
+/* ============================================================
+   [3. 고정 CTA 바 - 1300px 레이아웃]
+   ============================================================ */
+
+.fixed-bar { 
+    position: fixed; bottom: 0; left: 0; width: 100%; 
+    background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
+    padding: 15px; z-index: 2000; box-shadow: 0 -10px 40px rgba(0,0,0,0.1); 
+}
+
+.bar-container { max-width: var(--max-width); margin: 0 auto; display: flex; gap: 10px; }
+
+.bar-btn { 
+    flex: 1; height: 65px; display: flex; align-items: center; justify-content: center; 
+    border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 1.05rem; color: #fff; 
+}
+
+.bar-btn.navy { background: var(--navy); }
+.bar-btn.kakao { background: var(--kakao); color: #3E1A1A; }
+.bar-btn.naver { background: var(--naver); }
+.bar-btn.gold { background: var(--gold); }
+
+@media (max-width: 768px) {
+    .bar-btn { font-size: 0.8rem; height: 55px; }
+}
