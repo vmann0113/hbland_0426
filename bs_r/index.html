@@ -118,8 +118,8 @@
       --serif-en:'Cormorant Garamond',serif; --serif-kr:'Noto Serif KR',serif;
       --mono:ui-monospace,Menlo,Consolas,monospace; --ease-out:cubic-bezier(0.16,1,0.3,1);
       position:fixed; inset:0;
-      background:radial-gradient(circle at 50% 42%, rgba(184,153,104,0.18) 0%, rgba(184,153,104,0.05) 28%, rgba(12,10,8,0.94) 60%, rgba(8,7,5,0.97) 100%);
-      backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+      background:rgba(14,11,9,0.42);
+      backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
       z-index:999999; display:none; align-items:flex-start; justify-content:center;
       overflow-y:auto; padding:16px; opacity:0; transition:opacity .4s ease;
     }
@@ -205,6 +205,8 @@
     @keyframes btnPulse{0%{transform:scale(1); opacity:0.7;}70%{transform:scale(1.12); opacity:0;}100%{transform:scale(1.18); opacity:0;}}
 
     .roulette-hint{font-family:Pretendard,sans-serif; font-style:italic; font-weight:600; font-size:14px; letter-spacing:0.01em; text-transform:none; color:var(--brass-pale); margin-top:2px; margin-bottom:-2px;}
+    .roulette-later{margin-top:8px; background:none; border:0; color:var(--t-on-dark-muted); font-family:Pretendard,sans-serif; font-size:12.5px; font-weight:500; text-decoration:underline; text-underline-offset:3px; cursor:pointer; padding:6px 10px; transition:color .2s;}
+    .roulette-later:hover{color:var(--brass-pale);}
     .roulette-notice{width:calc(100% + 48px); margin:6px -24px -8px; padding:18px 24px 6px; border-top:1px solid var(--rule-dark); text-align:center;}
     .rn-lead{font-family:Pretendard,sans-serif; font-size:15px; font-weight:600; color:var(--t-on-dark-dim); margin:0 0 12px; line-height:1.5;}
     .rn-lead b{color:var(--brass-pale); font-weight:800;}
@@ -223,7 +225,7 @@
     #roulette-result .prize-name{display:block; font-family:var(--serif-en); font-style:italic; font-size:26px; color:var(--t-on-dark); line-height:1.25; text-shadow:0 0 22px rgba(243,220,166,0.35);}
     #roulette-result .kr-note{display:block; font-family:var(--serif-kr); font-style:normal; font-size:12px; color:var(--t-on-dark-dim); margin-top:10px; letter-spacing:0.10em;}
     @keyframes resultIn{from{opacity:0; transform:translateY(14px) scale(0.98);}to{opacity:1; transform:translateY(0) scale(1);}}
-    #roulette-overlay.is-result .spin-button,#roulette-overlay.is-result .roulette-hint,#roulette-overlay.is-result .roulette-marquee{display:none;}
+    #roulette-overlay.is-result .spin-button,#roulette-overlay.is-result .roulette-hint,#roulette-overlay.is-result .roulette-marquee,#roulette-overlay.is-result .roulette-later{display:none;}
 
     @media (max-width:500px){
       .roulette-modal{padding:38px 16px 20px; gap:12px;}
@@ -290,6 +292,7 @@
       </div>
     </div>
     <div id="roulette-result"></div>
+    <button type="button" class="roulette-later" onclick="closeRoulette()">다음에 참여하기</button>
   </div>
 </div>
 <!-- ▲▲▲ 새 룰렛 오버레이 끝 ▲▲▲ -->
@@ -490,7 +493,7 @@
   var DEFAULT_AFTER = ["10만원 상품권"];
   var spinCount = 0;
   var OPEN_MODE = 'load';          // 'load'=즉시 / 'delay'=8초·30%스크롤
-  var ONCE_PER_DEVICE = false;     // true=1기기 1회만
+  var ONCE_PER_DEVICE = true;      // true=1기기 1회만
   var STORE_KEY = 'hbRoulettePlayed';
 
   var isSpinning = false, currentRotation = 0, triggerArmed = false;
@@ -646,7 +649,10 @@
     addEventListener('scroll',onScroll,{passive:true}); setTimeout(trig,DELAY);
   }
   function initRoulette(){
-    if(ONCE_PER_DEVICE){try{if(localStorage.getItem(STORE_KEY))return;}catch(e){}}
+    /* ── 테스트용 백도어 ── 주소 끝에 ?resetRoulette 를 붙이면 1회 제한 해제 후 다시 돌릴 수 있음 */
+    var _q=(location.search+' '+location.hash).toLowerCase();
+    if(_q.indexOf('resetroulette')!==-1){ try{localStorage.removeItem(STORE_KEY);}catch(e){} }
+    else if(ONCE_PER_DEVICE){try{if(localStorage.getItem(STORE_KEY))return;}catch(e){}}
     drawWheel(WHEEL); drawBulbs(24); drawMarquee(MARQUEE); setupConfetti();
     if(OPEN_MODE==='delay') armTriggers(); else openRoulette();
   }
